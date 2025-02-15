@@ -43,7 +43,7 @@ const InitialLayout = () => {
     if (!initialized) return;
 
     // Check if the path/url is in the (auth) group
-    const inAuthGroup = segments[0] === "(app)";
+    const inAuthGroup = segments[0] === "(tabs)";
 
     if (session && !inAuthGroup) {
       // Redirect authenticated users to the list page
@@ -56,12 +56,13 @@ const InitialLayout = () => {
 
   return (
     <Stack
-      screenOptions={{
-        // headerShown: false,
-        headerTitle: "Authentifié : " + session?.user.email,
-      }}
+    // screenOptions={{
+    //   // headerShown: false,
+    //   headerTitle: "Authentifié : " + session?.user.email,
+    // }}
     >
-      <Stack.Screen name="(app)" />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
     </Stack>
   );
 };
@@ -92,9 +93,11 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+        {/* <SafeAreaView style={{ flex: 1 }}> */}
         <StatusBar style={isDarkColorScheme ? "light" : "dark"} backgroundColor="transparent" />
         <InitialLayout />
         <PortalHost />
+        {/* </SafeAreaView> */}
       </ThemeProvider>
     </AuthProvider>
   );

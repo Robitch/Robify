@@ -5,8 +5,9 @@ import { View } from "react-native"
 import { Text } from "./ui/text"
 import { FileUp } from "@/lib/icons/FileUp"
 import { cn } from "@/lib/utils"
-import { decode } from 'base64-arraybuffer'
-import FileSystem from 'expo-file-system'
+import { decode, encode } from 'base64-arraybuffer'
+import FileSystem, { copyAsync, makeDirectoryAsync, cacheDirectory, getInfoAsync, readAsStringAsync } from 'expo-file-system'
+import { File } from 'expo-file-system/next'
 
 import { useAuth } from "~/provider/AuthProvider"
 import { supabase } from "~/lib/supabase"
@@ -22,51 +23,34 @@ export default function FileUpload({ loadFiles }: { loadFiles: () => void }) {
     const [progress, setProgress] = useState(0)
 
     const onSelectMusic = async () => {
-
-        // open file 
         const result = await DocumentPicker.getDocumentAsync({
-            // type: 'audio/*, video/*, image/*',
-            copyToCacheDirectory: true,
+            type: 'audio/*',
+            copyToCacheDirectory: false,
         });
         if (result.canceled) return
 
         setMusic(result.assets[0])
     }
 
+    const createCacheFile = async ({ name, uri }: { name: string, uri: string }) => {
+        if (!(await getInfoAsync(cacheDirectory + "uploads/")).exists) {
+            await makeDirectoryAsync(cacheDirectory + "uploads/");
+        }
+        const cacheFilePath = cacheDirectory + "uploads/" + name;
+        await copyAsync({ from: uri, to: cacheFilePath });
+        return cacheFilePath;
+    }
+
 
     const uploadMusic = async () => {
         if (!music) return
 
-        console.log("Music", music)
-        const infos = await FileSystem.getInfoAsync(music.uri)
-        console.log("Information", infos)
-        if (!infos.exists) return
+        console.log("Music", music.uri)
+        const file = await createCacheFile({ name: music.name, uri: music.uri })
+        const base64 = await readAsStringAsync(file, { encoding: 'base64' })
+        const { data, error } = await supabase.storage.from('files').upload(music.name, decode(base64), { contentType: music.mimeType })
 
-        // during 2 seconds, update progress
-        // const interval = setInterval(() => {
-        //     setProgress(progress + 10)
-        // }, 2000)
-        console.log("Downloading fil")
-        // get SAF url
-        // const SAF_URL = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync(music.uri)
-        // const base64 = await FileSystem.readAsStringAsync(music.uri, { encoding: "base64" })
-        // console.log("Uploading file ", base64)
-        // const filePath = `${FileSystem.documentDirectory}${music.name}`
-        // await FileSystem.writeAsStringAsync(filePath, base64, { encoding: FileSystem.EncodingType.Base64 })
-
-
-
-        // const { data, error } = await supabase.storage.from('files').upload(music.name, decode(file), { contentType: music.mimeType })
-        // const { data, error } = await supabase.storage.from('files').upload(music.name, decode(music.uri), { contentType: music.mimeType })
-        const base64 = await FileSystem.readAsStringAsync(music.uri, { encoding: 'base64' });
-        // const filePath = `${user!.id}/${new Date().getTime()}.${music.mimeType?.toUpperCase().split('/')[1]}`;
-        // const contentType = music.mimeType?.toUpperCase().split('/')[1] === 'MP3' ? 'audio/mpeg' : 'video/mp4';
-        console.log("Base64", base64)
-        const contentType = music.mimeType
-        const response = await supabase.storage.from('files').upload(music.name, decode(base64), { contentType });
-        console.log(music.name, response)
-
-        if (response) {
+        if (data) {
             setProgress(100)
             setMusic(null)
             loadFiles()
@@ -74,10 +58,10 @@ export default function FileUpload({ loadFiles }: { loadFiles: () => void }) {
     }
 
 
-
     const resetMusic = () => {
         setMusic(null)
         setProgress(0)
+        loadFiles()
     }
 
     return (
@@ -126,7 +110,5 @@ export default function FileUpload({ loadFiles }: { loadFiles: () => void }) {
                 <Button className="flex-1" disabled={!music} onPress={uploadMusic}><Text>Upload</Text></Button>
             </CardFooter>
         </Card>
-
-
     )
 }
