@@ -16,7 +16,6 @@ import { Music2 } from "~/lib/icons/Music2"
 import { Progress } from "./ui/progress"
 import { Badge } from "./ui/badge"
 
-
 export default function FileUpload({ loadFiles }: { loadFiles: () => void }) {
     const [isPressed, setIsPressed] = useState(false)
     const [music, setMusic] = useState<DocumentPicker.DocumentPickerAsset | null>(null)
