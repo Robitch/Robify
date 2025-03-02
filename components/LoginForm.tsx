@@ -78,7 +78,7 @@ export function LoginForm() {
           <View className="p-6 md:p-8">
             <View className="flex-col gap-6">
               <View className="flex-col items-center text-center">
-                <H1 className="text-2xl font-bold">Welcome back</H1>
+                <H1 className="font-sans text-white text-2xl font-bold">Welcome back</H1>
                 <P className="text-balance text-muted-foreground">
                   Login to your Robify account
                 </P>

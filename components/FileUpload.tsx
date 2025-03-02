@@ -44,7 +44,6 @@ export default function FileUpload({ loadFiles }: { loadFiles: () => void }) {
     const uploadMusic = async () => {
         if (!music) return
 
-        console.log("Music", music.uri)
         const file = await createCacheFile({ name: music.name, uri: music.uri })
         const base64 = await readAsStringAsync(file, { encoding: 'base64' })
         const { data, error } = await supabase.storage.from('files').upload(music.name, decode(base64), { contentType: music.mimeType })

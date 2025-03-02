@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native'
 import { BlurView } from 'expo-blur'
 import { Ionicons } from '@expo/vector-icons'
 import { FloatingPlayer } from '~/components/FloatingPlayer'
+import { MusicPlayer } from '~/components/MusicPlayer'
 // Simple stack layout within the authenticated area
 const TabsLayout = () => {
   const { signOut } = useAuth()
@@ -44,18 +45,28 @@ const TabsLayout = () => {
           name="home"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color }) => <Ionicons name="home" size={20} color={color} />,
+            tabBarIcon: () => <Ionicons name="home" size={20} className='text-foreground' />,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
             title: 'Profile',
-            tabBarIcon: ({ color }) => <Ionicons name="person" size={20} color={color} />,
+            tabBarIcon: () => <Ionicons name="person" size={20} className="text-foreground" />,
+          }}
+        />
+        <Tabs.Screen
+          name="upload"
+          options={{
+            title: 'Upload',
+            tabBarIcon: () => (
+              <Ionicons name="cloud-upload-outline" size={20} className='text-foreground' />
+            ),
           }}
         />
       </Tabs>
-      <FloatingPlayer className="absolute bottom-14 left-0 right-0" />
+      {/* <FloatingPlayer className="absolute bottom-14 left-0 right-0" /> */}
+      <MusicPlayer />
 
     </>
   )

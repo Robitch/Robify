@@ -23,6 +23,7 @@ interface AudioStore {
     pause: () => Promise<void>;
     nextTrack: () => Promise<void>;
     addToQueue: (track: Track) => void;
+    setPositionAsync: (position: number) => Promise<void>;
 }
 
 // Mode audio
@@ -55,7 +56,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
             get().onPlaybackStatusUpdate
         );
 
-        set({ sound, currentTrack: { ...track, url: "https://picsum.photos/1000/1100" }, position: 0, duration: 0 });
+        set({
+            sound, currentTrack: {
+                ...track, album: "https://static.fnac-static.com/multimedia/FR/Images_Produits/FR/fnac.com/Visual_Principal_340/5/2/1/0016861765125.jpg"
+            }, position: 0, duration: 0
+        });
     },
 
     onPlaybackStatusUpdate: (status) => {
@@ -97,4 +102,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     addToQueue: (track) => {
         set((state) => ({ queue: [...state.queue, track] }));
     },
+
+    setPositionAsync: async (position: number) => {
+        const sound = get().sound;
+        if (sound) {
+            await sound.setPositionAsync(position);
+        }
+    }
 }));

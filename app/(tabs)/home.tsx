@@ -7,24 +7,47 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { FileObject } from "@supabase/storage-js";
 import { useAudioStore } from "@/store/audio";
+import { Track } from "~/types";
+
+
+type SortField = 'title' | 'artist' | 'duration';
+type SortOrder = 'asc' | 'desc';
 
 export default function Home() {
-  const { user } = useAuth();
-  const [files, setFiles] = useState<FileObject[]>([]);
-  const { loadTrack, play } = useAudioStore();
+  // const { user } = useAuth();
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortField, setSortField] = useState<SortField>('title');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-    loadFiles();
-  }, [user]);
+    // if (!user) return;
+    fetchTracks()
+  }, [sortField, sortOrder]);
 
-  const loadFiles = async () => {
-    const { data, error } = await supabase.storage.from("files").list();
-    if (error) {
-      console.error("Error loading files:", error);
-    }
-    if (data) {
-      setFiles(data);
+  const fetchTracks = async () => {
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('tracks')
+        .select(`
+          *,
+          artists (
+            name
+          )
+        `)
+        .order(sortField, { ascending: sortOrder === 'asc' });
+
+      if (fetchError) throw fetchError;
+
+      setTracks(data || []);
+      console.log('Tracks:', data);
+    } catch (err) {
+      setError('Erreur lors du chargement des morceaux');
+      console.error('Error fetching tracks:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -32,13 +55,13 @@ export default function Home() {
 
   return (
     <ScrollView className="p-6 bg-secondary">
-      <FileUpload loadFiles={loadFiles} />
+      {/* <FileUpload loadFiles={loadFiles} /> */}
       <ScrollView className="p-6" contentContainerStyle={{ gap: 10 }}>
-        {files.map((item) => (
+        {tracks.map((item) => (
           <MusicItem
             key={item.id}
             item={item}
-            userId={user!.id}
+            // userId={user!.id}
             onRemoveMusic={() => void 0}
           />
         ))}

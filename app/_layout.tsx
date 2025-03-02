@@ -1,4 +1,6 @@
 import "~/global.css";
+import { useEffect } from "react";
+import { useFonts } from "expo-font";
 
 import {
   DarkTheme,
@@ -6,6 +8,7 @@ import {
   Theme,
   ThemeProvider,
 } from "@react-navigation/native";
+import * as SplashScreen from 'expo-splash-screen';
 import { Slot, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
@@ -18,7 +21,6 @@ import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/provider/AuthProvider";
 import { useSegments, useRouter } from "expo-router";
-import { useEffect } from "react";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -34,10 +36,14 @@ export {
   ErrorBoundary,
 } from "expo-router";
 
+SplashScreen.preventAutoHideAsync();
+
 const InitialLayout = () => {
   const { session, initialized } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+
 
   useEffect(() => {
     if (!initialized) return;
@@ -50,20 +56,20 @@ const InitialLayout = () => {
       router.replace("/home");
     } else if (!session) {
       // Redirect unauthenticated users to the login page
-      router.replace("/");
+      router.replace("/(onboarding)/get-started");
     }
   }, [session, initialized]);
 
-  return (
-    <Stack
-    // screenOptions={{
-    //   // headerShown: false,
-    //   headerTitle: "Authentifié : " + session?.user.email,
-    // }}
-    >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-      <Stack.Screen
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" options={{ animation: 'none' }} />
+      <Stack.Screen name="(onboarding)" options={{ animation: 'slide_from_right' }} />
+      {/* <Stack.Screen name="(auth)/index" options={{ animation: 'slide_from_right' }} /> */}
+      <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+
+      {/* <Stack.Screen
         name="player"
         options={{
           presentation: 'card',
@@ -73,7 +79,7 @@ const InitialLayout = () => {
           headerShown: false,
           animation: "slide_from_bottom",
         }}
-      />
+      /> */}
 
     </Stack>
   );
@@ -83,6 +89,13 @@ export default function RootLayout() {
   const hasMounted = React.useRef(false);
   const { colorScheme, isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = React.useState(false);
+  const [loaded, error] = useFonts({
+    "Satoshi-Regular": require("~/assets/fonts/Satoshi-Regular.otf"),
+    "Satoshi-Bold": require("~/assets/fonts/Satoshi-Bold.otf"),
+    "Satoshi-Medium": require("~/assets/fonts/Satoshi-Medium.otf"),
+    "Satoshi-Light": require("~/assets/fonts/Satoshi-Light.otf"),
+    "Satoshi-Black": require("~/assets/fonts/Satoshi-Black.otf"),
+  });
 
   useIsomorphicLayoutEffect(() => {
     if (hasMounted.current) {
@@ -98,7 +111,13 @@ export default function RootLayout() {
     hasMounted.current = true;
   }, []);
 
-  if (!isColorSchemeLoaded) {
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if ((!loaded && !error) || !isColorSchemeLoaded) {
     return null;
   }
 

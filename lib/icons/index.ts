@@ -7,4 +7,5 @@ export { FastForward } from './FastForward';
 export { Rewind } from './Rewind';
 export { Shuffle } from './Shuffle';
 export { Repeat } from './Repeat';
+export { ChevronDown } from './ChevronDown';
 
