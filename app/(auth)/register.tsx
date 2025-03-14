@@ -54,10 +54,11 @@ export default function RegisterScreen() {
 
             {/* Form */}
 
-            <KeyboardAwareScrollView
+            {/* <KeyboardAwareScrollView
                 // behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 className="gap-5"
-            >
+            > */}
+            <View className='gap-5'>
                 <Controller
                     control={control}
                     rules={{
@@ -135,7 +136,7 @@ export default function RegisterScreen() {
                     name="password"
                 />
 
-            </KeyboardAwareScrollView>
+            </View>
 
             {/* Button submit */}
             <Link href="/choose-theme" asChild>
