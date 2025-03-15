@@ -32,7 +32,7 @@ export default function RegisterScreen() {
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             // After successful registration
-            router.replace('/login');
+            router.replace('/home');
         } catch (error) {
             console.error('Registration failed:', error);
         } finally {
@@ -73,9 +73,9 @@ export default function RegisterScreen() {
                                 onChangeText={onChange}
                                 value={value}
                             />
-                            {/* {errors.name && (
+                            {errors.name && (
                                 <Text className="text-red-700 mt-1">{errors.name.message}</Text>
-                            )} */}
+                            )}
                         </View>
                     )}
                     name="name"
@@ -84,7 +84,7 @@ export default function RegisterScreen() {
                 <Controller
                     control={control}
                     rules={{
-                        // required: 'Email is required',
+                        required: 'Email is required',
                         pattern: {
                             value: /^\S+@\S+\.\S+$/,
                             message: 'Please enter a valid email',
@@ -101,9 +101,9 @@ export default function RegisterScreen() {
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                             />
-                            {/* {errors.email && (
+                            {errors.email && (
                                 <Text className="text-red-500 mt-1">{errors.email.message}</Text>
-                            )} */}
+                            )}
                         </View>
                     )}
                     name="email"
@@ -128,9 +128,9 @@ export default function RegisterScreen() {
                                 value={value}
                                 secureTextEntry
                             />
-                            {/* {errors.password && (
+                            {errors.password && (
                                 <Text className="text-red-500 mt-1">{errors.password.message}</Text>
-                            )} */}
+                            )}
                         </View>
                     )}
                     name="password"
@@ -139,15 +139,15 @@ export default function RegisterScreen() {
             </View>
 
             {/* Button submit */}
-            <Link href="/choose-theme" asChild>
-                <Button className="w-full my-10" style={{ height: 92, borderRadius: 30 }} disabled={isLoading}>
-                    {isLoading ? (
-                        <ActivityIndicator color="white" />
-                    ) : (
-                        <Text className="text-foreground" style={{ fontSize: 21, fontWeight: "bold" }}>Get Started</Text>
-                    )}
-                </Button>
-            </Link>
+            {/* <Link href="/choose-theme" asChild> */}
+            <Button className="w-full my-10" style={{ height: 92, borderRadius: 30 }} disabled={isLoading} onPress={handleSubmit(onSubmit)}>
+                {isLoading ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text className="text-foreground" style={{ fontSize: 21, fontWeight: "bold" }}>Get Started</Text>
+                )}
+            </Button>
+            {/* </Link> */}
 
             {/* Divider */}
             {/* <View className="flex-row items-center gap-5">
