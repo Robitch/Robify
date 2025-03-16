@@ -21,6 +21,8 @@ import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/provider/AuthProvider";
 import { useSegments, useRouter } from "expo-router";
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -69,8 +71,8 @@ const InitialLayout = () => {
       {/* <Stack.Screen name="(auth)/index" options={{ animation: 'slide_from_right' }} /> */}
       <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
 
-      {/* <Stack.Screen
-        name="player"
+      <Stack.Screen
+        name="PlayerScreen"
         options={{
           presentation: 'card',
           gestureEnabled: true,
@@ -79,8 +81,20 @@ const InitialLayout = () => {
           headerShown: false,
           animation: "slide_from_bottom",
         }}
-      /> */}
-
+      />
+      <Stack.Screen
+        name="(modals)/addToPlaylist"
+        options={{
+          presentation: 'modal',
+          // headerStyle: {
+          //   backgroundColor: colors.background,
+          // },
+          headerTitle: 'Add to playlist',
+          // headerTitleStyle: {
+          //   color: colors.text,
+          // },
+        }}
+      />
     </Stack>
   );
 };
@@ -124,11 +138,13 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-        {/* <SafeAreaView style={{ flex: 1 }}> */}
-        <StatusBar style={isDarkColorScheme ? "light" : "dark"} backgroundColor="transparent" />
-        <InitialLayout />
-        <PortalHost />
-        {/* </SafeAreaView> */}
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          {/* <SafeAreaView style={{ flex: 1 }}> */}
+          <StatusBar style={isDarkColorScheme ? "light" : "dark"} backgroundColor="transparent" />
+          <InitialLayout />
+          <PortalHost />
+          {/* </SafeAreaView> */}
+        </GestureHandlerRootView>
       </ThemeProvider>
     </AuthProvider>
   );

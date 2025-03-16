@@ -7,6 +7,7 @@ export interface Track {
     artwork_url?: string;
     created_at: string;
     updated_at: string;
+    rating?: number;
     artists?: {
         name: string;
     };
@@ -32,3 +33,5 @@ export interface PlaylistTrack {
     track_id: string;
     position: number;
 }
+
+export type TrackWithPlaylist = Track & { playlist?: string[] }

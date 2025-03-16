@@ -42,6 +42,15 @@ const TabsLayout = () => {
           // ),
         }}>
         <Tabs.Screen
+          name="(songs)"
+          options={{
+            title: 'Songs',
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="musical-notes-sharp" size={24} className='text-foreground' />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="home"
           options={{
             title: 'Home',
@@ -66,6 +75,14 @@ const TabsLayout = () => {
         />
       </Tabs>
       {/* <FloatingPlayer className="absolute bottom-14 left-0 right-0" /> */}
+      <FloatingPlayer
+        style={{
+          position: 'absolute',
+          left: 8,
+          right: 8,
+          bottom: 78,
+        }}
+      />
       <MusicPlayer />
 
     </>

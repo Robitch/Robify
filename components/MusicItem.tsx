@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Track } from '~/types';
 import { usePlayerStore } from '~/store/playerStore';
+import TrackPlayer from 'react-native-track-player';
 
 export default function MusicItem({
     item,
@@ -18,8 +19,50 @@ export default function MusicItem({
     // userId: string;
     onRemoveMusic: () => void;
 }) {
-    const { playTrack } = usePlayerStore();
-    
+    // const { playTrack } = usePlayerStore();
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+    const [musicUrl, setMusicUrl] = useState('');
+
+    useEffect(() => {
+        const fetchCurrentTrack = async () => {
+            await TrackPlayer.setupPlayer();
+            const currentTrack = await TrackPlayer.getCurrentTrack();
+            if (currentTrack) {
+                const track = await TrackPlayer.getTrack(currentTrack);
+                setCurrentTrack(track);
+            }
+        };
+
+        fetchCurrentTrack();
+    }, []);
+
+    const playTrack = async (track: Track) => {
+        try {
+            if (currentTrack?.url === track.url) {
+                if (isPlaying) {
+                    await TrackPlayer.pause();
+                } else {
+                    await TrackPlayer.play();
+                }
+                setIsPlaying(!isPlaying);
+            } else {
+                await TrackPlayer.reset();
+                await TrackPlayer.add({
+                    id: track.id,
+                    url: track.url,
+                    title: track.title,
+                    artist: track.artists[0].name,
+                    artwork: track.artwork,
+                });
+                await TrackPlayer.play();
+                setIsPlaying(true);
+            }
+        } catch (error) {
+            console.error('Error playing track:', error);
+        }
+    }
+
 
     return (
         <View className="flex-row items-center gap-2">
