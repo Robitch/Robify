@@ -18,7 +18,7 @@ export const PlayerVolumeBar = ({ style }: ViewProps) => {
 	return (
 		<View style={style}>
 			<View style={{ flexDirection: 'row', alignItems: 'center' }}>
-				<Ionicons name="volume-low" size={20} color={colors.icon} style={{ opacity: 0.8 }} />
+				<Ionicons name="volume-low" size={20} className='text-yellow-600' style={{ opacity: 0.8 }} />
 
 				<View style={{ flex: 1, flexDirection: 'row', paddingHorizontal: 10 }}>
 					<Slider
@@ -38,7 +38,7 @@ export const PlayerVolumeBar = ({ style }: ViewProps) => {
 					/>
 				</View>
 
-				<Ionicons name="volume-high" size={20} color={colors.icon} style={{ opacity: 0.8 }} />
+				<Ionicons name="volume-high" size={20} className='text-yellow-600' style={{ opacity: 0.8 }} />
 			</View>
 		</View>
 	)

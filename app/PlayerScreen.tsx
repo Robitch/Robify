@@ -35,7 +35,7 @@ const PlayerScreen = () => {
     return (
         <LinearGradient
             style={{ flex: 1 }}
-            colors={imageColors ? [imageColors.background, imageColors.primary] : [colors.background]}
+            colors={imageColors ? [imageColors.background, imageColors.primary] : [colors.background, colors.background]}
         >
             <View style={styles.overlayContainer}>
                 <DismissPlayerSymbol />
@@ -81,7 +81,8 @@ const PlayerScreen = () => {
                                     <FontAwesome
                                         name={isFavorite ? 'heart' : 'heart-o'}
                                         size={20}
-                                        color={isFavorite ? colors.primary : colors.icon}
+                                        // color={isFavorite ? colors.primary : colors.icon}
+                                        className={isFavorite ? 'text-primary' : 'text-rose-500'}
                                         style={{ marginHorizontal: 14 }}
                                         onPress={toggleFavorite}
                                     />

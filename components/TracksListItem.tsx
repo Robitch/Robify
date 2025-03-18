@@ -58,14 +58,14 @@ export const TracksListItem = ({
 								style={styles.trackPlayingIconIndicator}
 								name="pause"
 								size={24}
-								color={colors.icon}
+								className='text-blue-700'
 							/>
 						) : (
 							<Ionicons
 								style={styles.trackPausedIndicator}
 								name="play"
 								size={24}
-								color={colors.icon}
+								className='text-blue-700'
 							/>
 						))}
 				</View>
@@ -99,7 +99,7 @@ export const TracksListItem = ({
 
 					<StopPropagation>
 						<TrackShortcutsMenu track={track}>
-							<Entypo name="dots-three-horizontal" size={18} color={colors.icon} />
+							<Entypo name="dots-three-horizontal" size={18} className='text-blue-700' />
 						</TrackShortcutsMenu>
 					</StopPropagation>
 				</View>

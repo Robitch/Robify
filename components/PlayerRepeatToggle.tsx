@@ -33,7 +33,7 @@ export const PlayerRepeatToggle = ({ ...iconProps }: IconProps) => {
 		<MaterialCommunityIcons
 			name={icon}
 			onPress={toggleRepeatMode}
-			color={colors.icon}
+			className="text-foreground"
 			{...iconProps}
 		/>
 	)

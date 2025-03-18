@@ -10,4 +10,4 @@ export function App() {
 }
 
 registerRootComponent(App);
-TrackPlayer.registerPlaybackService(() => require('./service'));
+TrackPlayer.registerPlaybackService(() => require('./constants/playbackService'));

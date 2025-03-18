@@ -42,7 +42,7 @@ export const PlaylistListItem = ({ playlist, ...props }: PlaylistListItemProps) 
 						{playlist.name}
 					</Text>
 
-					<AntDesign name="right" size={16} color={colors.icon} style={{ opacity: 0.5 }} />
+					<AntDesign name="right" size={16} className='text-amber-800' style={{ opacity: 0.5 }} />
 				</View>
 			</View>
 		</TouchableHighlight>

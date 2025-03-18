@@ -17,7 +17,7 @@ interface ExpandedPlayerProps {
     scrollComponent?: (props: any) => React.ReactElement;
 }
 
-export default function Player({ scrollComponent }: ExpandedPlayerProps) {
+export default function PlayerPlayer({ scrollComponent }: ExpandedPlayerProps) {
     const ScrollComponentToUse = scrollComponent || ScrollView;
     const [colors, setColors] = useState<string[]>(["#000", "#fff"]);
     const {
