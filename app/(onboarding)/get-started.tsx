@@ -45,8 +45,8 @@ export default function GetStarted() {
       {/* Paragraph */}
       <Text className="text-xl text-center text-muted-foreground">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis enim purus sed phasellus. Cursus ornare id scelerisque aliquam.</Text>
       {/* Button */}
-      <Link href="/choose-theme" asChild>
-        <Button className="w-full" style={{ height: 92, borderRadius: 30 }}><Text className="text-foreground" style={{ fontSize: 21, fontWeight: "bold" }}>Get Started</Text></Button>
+      <Link href="/invitation-code" asChild>
+        <Button className="w-full" style={{ height: 92, borderRadius: 30 }}><Text className="text-foreground" style={{ fontSize: 21, fontWeight: "bold" }}>Commencer</Text></Button>
       </Link>
     </ImageBackground>
   );

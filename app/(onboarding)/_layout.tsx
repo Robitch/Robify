@@ -22,8 +22,9 @@ export default function OnboardingLayout() {
             animation: 'slide_from_right'
         }}>
             <Stack.Screen name="get-started" />
-            <Stack.Screen name="choose-theme" />
+            <Stack.Screen name="invitation-code" />
             <Stack.Screen name="auth-options" />
+            <Stack.Screen name="choose-theme" />
         </Stack>
     );
 }

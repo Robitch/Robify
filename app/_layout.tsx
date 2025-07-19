@@ -2,6 +2,9 @@ import "~/global.css";
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
 
+import { playbackService } from "@/constants/playbackService";
+import TrackPlayer from "react-native-track-player";
+
 import {
   DarkTheme,
   DefaultTheme,
@@ -16,12 +19,13 @@ import { Platform } from "react-native";
 import { NAV_THEME } from "~/lib/constants";
 import { useColorScheme } from "~/lib/useColorScheme";
 import { PortalHost } from "@rn-primitives/portal";
-import { ThemeToggle } from "~/components/ThemeToggle";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/provider/AuthProvider";
 import { useSegments, useRouter } from "expo-router";
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useSetupTrackPlayer } from "~/hooks/useSetupTrackPlayer";
+
+
 
 
 const LIGHT_THEME: Theme = {
@@ -40,6 +44,7 @@ export {
 
 SplashScreen.preventAutoHideAsync();
 
+
 const InitialLayout = () => {
   const { session, initialized } = useAuth();
   const segments = useSegments();
@@ -54,10 +59,10 @@ const InitialLayout = () => {
     const inAuthGroup = segments[0] === "(tabs)";
 
     if (session && !inAuthGroup) {
-      // Redirect authenticated users to the list page
+      // Redirect authenticated users to the main app
       router.replace("/home");
     } else if (!session) {
-      // Redirect unauthenticated users to the login page
+      // Redirect unauthenticated users to the onboarding flow
       router.replace("/(onboarding)/get-started");
     }
   }, [session, initialized]);
@@ -83,6 +88,14 @@ const InitialLayout = () => {
         }}
       />
       <Stack.Screen
+        name="ProfileSetup"
+        options={{
+          presentation: 'card',
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+      <Stack.Screen
         name="(modals)/addToPlaylist"
         options={{
           presentation: 'modal',
@@ -103,6 +116,8 @@ export default function RootLayout() {
   const hasMounted = React.useRef(false);
   const { colorScheme, isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = React.useState(false);
+  const [isPlayerReady, setIsPlayerReady] = React.useState(false);
+
   const [loaded, error] = useFonts({
     "Satoshi-Regular": require("~/assets/fonts/Satoshi-Regular.otf"),
     "Satoshi-Bold": require("~/assets/fonts/Satoshi-Bold.otf"),
@@ -130,6 +145,12 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded, error]);
+
+  useSetupTrackPlayer({
+    onLoad: () => {
+      setIsPlayerReady(true);
+    },
+  });
 
   if ((!loaded && !error) || !isColorSchemeLoaded) {
     return null;

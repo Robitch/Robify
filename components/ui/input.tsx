@@ -1,32 +1,107 @@
 import * as React from 'react';
-import { TextInput, View, TouchableOpacity, type TextInputProps } from 'react-native';
+import { TextInput, View, TouchableOpacity, type TextInputProps, Text } from 'react-native';
 import { cn } from '~/lib/utils';
 import { Ionicons } from '@expo/vector-icons';
+import { useColorScheme } from '~/lib/useColorScheme';
 
-const Input = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProps>(
-  ({ className, placeholderClassName, secureTextEntry, ...props }, ref) => {
+interface InputProps extends TextInputProps {
+  label?: string;
+  error?: string;
+  helper?: string;
+  leftIcon?: string;
+  rightIcon?: string;
+  onRightIconPress?: () => void;
+}
+
+const Input = React.forwardRef<React.ElementRef<typeof TextInput>, InputProps>(
+  ({ className, placeholderClassName, secureTextEntry, label, error, helper, leftIcon, rightIcon, onRightIconPress, ...props }, ref) => {
     const [isPasswordVisible, setIsPasswordVisible] = React.useState(!secureTextEntry);
+    const [isFocused, setIsFocused] = React.useState(false);
+    const { isDarkColorScheme } = useColorScheme();
+
+    const borderColor = error
+      ? '#ef4444'
+      : isFocused
+        ? '#10b981'
+        : isDarkColorScheme
+          ? '#374151'
+          : '#e5e7eb';
 
     return (
-      <View style={{ position: 'relative', width: '100%' }}>
-        <TextInput
-          ref={ref}
-          className={cn(
-            'web:flex  web:w-full rounded-[2rem] border border-input bg-background py-10 px-7  web:py-2 text-base lg:text-sm native:text-lg native:leading-[1.25] text-foreground placeholder:font-semibold placeholder:text-muted-foreground web:ring-offset-background file:border-0 file:bg-transparent file:font-medium web:focus-visible:outline-none web:focus-visible:ring-2 web:focus-visible:ring-ring web:focus-visible:ring-offset-2',
-            props.editable === false && 'opacity-50 web:cursor-not-allowed',
-            className
+      <View className="w-full">
+        {label && (
+          <Text className="text-sm font-medium text-foreground mb-2">
+            {label}
+          </Text>
+        )}
+        <View
+          style={{
+            position: 'relative',
+            borderWidth: 1.5,
+            borderColor,
+            borderRadius: 12,
+            backgroundColor: isDarkColorScheme ? '#1f2937' : '#ffffff',
+          }}
+          className="flex-row items-center"
+        >
+          {leftIcon && (
+            <View className="pl-4">
+              <Ionicons
+                name={leftIcon as any}
+                size={20}
+                className={`text-${isDarkColorScheme ? '9ca3af' : '6b7280'}`}
+              />
+            </View>
           )}
-          placeholderClassName={cn('text-muted-foreground', placeholderClassName)}
-          secureTextEntry={!isPasswordVisible}
-          {...props}
-        />
-        {secureTextEntry && (
-          <TouchableOpacity
-            style={{ position: 'absolute', right: 20, top: '50%', transform: [{ translateY: -12 }] }}
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-          >
-            <Ionicons name={isPasswordVisible ? 'eye-off' : 'eye'} size={24} className='text-muted-foreground' />
-          </TouchableOpacity>
+          <TextInput
+            ref={ref}
+            className={cn(
+              'flex-1 py-4 text-base text-foreground',
+              leftIcon ? 'pl-3' : 'pl-4',
+              (secureTextEntry || rightIcon || onRightIconPress) ? 'pr-3' : 'pr-4',
+              props.editable === false && 'opacity-50',
+              className
+            )}
+            style={{
+              fontSize: 16,
+              color: isDarkColorScheme ? '#f9fafb' : '#111827',
+            }}
+            placeholderTextColor={isDarkColorScheme ? '#6b7280' : '#9ca3af'}
+            secureTextEntry={secureTextEntry && !isPasswordVisible}
+            onFocus={(e) => {
+              setIsFocused(true);
+              props.onFocus?.(e);
+            }}
+            onBlur={(e) => {
+              setIsFocused(false);
+              props.onBlur?.(e);
+            }}
+            {...props}
+          />
+          {(secureTextEntry || rightIcon || onRightIconPress) && (
+            <TouchableOpacity
+              className="pr-4"
+              onPress={secureTextEntry ? () => setIsPasswordVisible(!isPasswordVisible) : onRightIconPress}
+            >
+              <Ionicons
+                name={
+                  secureTextEntry
+                    ? (isPasswordVisible ? 'eye-off' : 'eye')
+                    : (rightIcon as any)
+                }
+                size={20}
+                className={`text-${isDarkColorScheme ? '9ca3af' : '6b7280'}`}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+        {(error || helper) && (
+          <Text className={cn(
+            'text-sm mt-1',
+            error ? 'text-red-500' : 'text-muted-foreground'
+          )}>
+            {error || helper}
+          </Text>
         )}
       </View>
     );
@@ -35,4 +110,4 @@ const Input = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProp
 
 Input.displayName = 'Input';
 
-export { Input };
+export { Input, type InputProps };

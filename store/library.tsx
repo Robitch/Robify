@@ -67,7 +67,7 @@ export const useArtists = () =>
             }
 
             return acc
-        }, [] as Artist[])
+        }, [] as any[])
     })
 
 export const usePlaylists = () => {

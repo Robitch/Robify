@@ -1,170 +1,290 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
-import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from '~/components/ui/text';
 import { Input } from '~/components/ui/input';
-import { Link } from 'expo-router';
 import { Button } from '~/components/ui/button';
+import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useAuth } from '@/provider/AuthProvider';
 
-type RegisterFormData = {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-};
+interface RegisterFormData {
+  full_name: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function RegisterScreen() {
-    const insets = useSafeAreaInsets();
-    const [isLoading, setIsLoading] = useState(false);
-    const { control, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>();
-    const password = watch("password");
+  const insets = useSafeAreaInsets();
+  const { signUp, loading, error, clearError } = useAuth();
+  const { invitationCode } = useLocalSearchParams<{ invitationCode: string }>();
 
-    const onSubmit = async (data: RegisterFormData) => {
-        setIsLoading(true);
-        try {
-            // Replace with your actual registration logic
-            console.log('Register data:', data);
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+  const { control, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>(
+    {
+      defaultValues: {
+        full_name: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      },
+    }
+  );
+  const password = watch("password");
 
-            // After successful registration
-            router.replace('/home');
-        } catch (error) {
-            console.error('Registration failed:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  const onSubmit = async (data: RegisterFormData) => {
+    clearError();
 
-    return (
-        <View className="flex-1 justify-center px-6" style={{
-            paddingTop: insets.top + 80,
-            paddingBottom: insets.bottom + 25,
-        }}>
-            <View className="my-20 gap-5">
-                {/* Title */}
-                <Text className="text-3xl font-bold text-center">Register</Text>
-                {/* Subtitle */}
-                <Text className="text-center text-foreground">Create an account to enjoy music</Text>
+    if (data.password !== data.confirmPassword) {
+      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
+      return;
+    }
+
+    try {
+      await signUp(data.email, data.password, {
+        full_name: data.full_name,
+        username: data.username,
+      });
+
+      // Mark invitation code as used if provided
+      if (invitationCode) {
+        // TODO: Mark invitation code as used in database
+      }
+
+      // Navigate to home directly for now (bypass profile setup)
+      router.replace('/home');
+    } catch (error) {
+      Alert.alert(
+        'Erreur d\'inscription',
+        'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
+      );
+    }
+  };
+
+  return (
+    <ScrollView
+      className="flex-1 px-6"
+      style={{
+        // paddingTop: insets.top + 40,
+        paddingBottom: insets.bottom + 25,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Logo */}
+      {/* <Image
+        source={require("@/assets/images/logo.svg")}
+        contentFit="contain"
+        style={{
+          width: "70%",
+          height: 50,
+          alignSelf: 'center',
+          marginBottom: 30,
+        }}
+      /> */}
+
+      {/* Title */}
+      <View className="gap-4 mb-8">
+        <Text className="text-3xl font-bold text-center">
+          Créer un compte
+        </Text>
+        <Text className="text-center text-muted-foreground text-lg">
+          Rejoignez la communauté musicale de vos amis
+        </Text>
+      </View>
+
+
+      {/* Form */}
+      <View className="gap-4">
+        <Controller
+          control={control}
+          rules={{
+            required: 'Le nom complet est requis',
+            minLength: {
+              value: 2,
+              message: 'Le nom doit contenir au moins 2 caractères',
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Input
+                className={errors.full_name ? 'border-red-500' : ''}
+                placeholder="Nom complet"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                autoComplete="name"
+              />
+              {errors.full_name && (
+                <Text className="text-red-500 mt-1">
+                  {errors.full_name.message}
+                </Text>
+              )}
             </View>
+          )}
+          name="full_name"
+        />
 
-            {/* Form */}
-
-            {/* <KeyboardAwareScrollView
-                // behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                className="gap-5"
-            > */}
-            <View className='gap-5'>
-                <Controller
-                    control={control}
-                    rules={{
-                        required: 'Name is required',
-                    }}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <View>
-                            <Input
-                                className={errors.name ? 'border-red-500' : ''}
-                                placeholder="Name"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                            />
-                            {errors.name && (
-                                <Text className="text-red-700 mt-1">{errors.name.message}</Text>
-                            )}
-                        </View>
-                    )}
-                    name="name"
-                />
-
-                <Controller
-                    control={control}
-                    rules={{
-                        required: 'Email is required',
-                        pattern: {
-                            value: /^\S+@\S+\.\S+$/,
-                            message: 'Please enter a valid email',
-                        },
-                    }}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <View>
-                            <Input
-                                className={errors.email ? 'border-red-500' : ''}
-                                placeholder="Email"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                            />
-                            {errors.email && (
-                                <Text className="text-red-500 mt-1">{errors.email.message}</Text>
-                            )}
-                        </View>
-                    )}
-                    name="email"
-                />
-
-                <Controller
-                    control={control}
-                    rules={{
-                        required: 'Password is required',
-                        minLength: {
-                            value: 6,
-                            message: 'Password must be at least 6 characters',
-                        },
-                    }}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <View>
-                            <Input
-                                className={errors.password ? 'border-red-500' : ''}
-                                placeholder="Password"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                secureTextEntry
-                            />
-                            {errors.password && (
-                                <Text className="text-red-500 mt-1">{errors.password.message}</Text>
-                            )}
-                        </View>
-                    )}
-                    name="password"
-                />
-
+        <Controller
+          control={control}
+          rules={{
+            required: 'Le nom d\'utilisateur est requis',
+            minLength: {
+              value: 3,
+              message: 'Le nom d\'utilisateur doit contenir au moins 3 caractères',
+            },
+            pattern: {
+              value: /^[a-zA-Z0-9_]+$/,
+              message: 'Seuls les lettres, chiffres et _ sont autorisés',
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Input
+                className={errors.username ? 'border-red-500' : ''}
+                placeholder="Nom d'utilisateur"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                autoCapitalize="none"
+                autoComplete="username"
+              />
+              {errors.username && (
+                <Text className="text-red-500 mt-1">
+                  {errors.username.message}
+                </Text>
+              )}
             </View>
+          )}
+          name="username"
+        />
 
-            {/* Button submit */}
-            {/* <Link href="/choose-theme" asChild> */}
-            <Button className="w-full my-10" style={{ height: 92, borderRadius: 30 }} disabled={isLoading} onPress={handleSubmit(onSubmit)}>
-                {isLoading ? (
-                    <ActivityIndicator color="white" />
-                ) : (
-                    <Text className="text-foreground" style={{ fontSize: 21, fontWeight: "bold" }}>Get Started</Text>
-                )}
-            </Button>
-            {/* </Link> */}
-
-            {/* Divider */}
-            {/* <View className="flex-row items-center gap-5">
-                <View className="flex-1 border-t border-muted-foreground" />
-                <Text className="text-muted-foreground text-md">Or</Text>
-                <View className="flex-1 border-t border-muted-foreground" />
-            </View> */}
-
-            {/* //TODO Google / Apple authentication */}
-
-            {/* Link to login page */}
-            <View className="flex-row justify-center">
-                <Text className="text-gray-600">Already have an account? </Text>
-                <TouchableOpacity onPress={() => router.replace('/login')}>
-                    <Text className="text-blue-500 font-semibold">Sign In</Text>
-                </TouchableOpacity>
+        <Controller
+          control={control}
+          rules={{
+            required: 'L\'email est requis',
+            pattern: {
+              value: /^\S+@\S+\.\S+$/,
+              message: 'Veuillez entrer un email valide',
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Input
+                className={errors.email ? 'border-red-500' : ''}
+                placeholder="Email"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+              />
+              {errors.email && (
+                <Text className="text-red-500 mt-1">
+                  {errors.email.message}
+                </Text>
+              )}
             </View>
-        </View>
-    );
+          )}
+          name="email"
+        />
+
+        <Controller
+          control={control}
+          rules={{
+            required: 'Le mot de passe est requis',
+            minLength: {
+              value: 6,
+              message: 'Le mot de passe doit contenir au moins 6 caractères',
+            },
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Input
+                className={errors.password ? 'border-red-500' : ''}
+                placeholder="Mot de passe"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                secureTextEntry
+                autoComplete="password"
+              />
+              {errors.password && (
+                <Text className="text-red-500 mt-1">
+                  {errors.password.message}
+                </Text>
+              )}
+            </View>
+          )}
+          name="password"
+        />
+
+        <Controller
+          control={control}
+          rules={{
+            required: 'Veuillez confirmer votre mot de passe',
+            validate: (value) =>
+              value === password || 'Les mots de passe ne correspondent pas',
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Input
+                className={errors.confirmPassword ? 'border-red-500' : ''}
+                placeholder="Confirmer le mot de passe"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                secureTextEntry
+                autoComplete="password"
+              />
+              {errors.confirmPassword && (
+                <Text className="text-red-500 mt-1">
+                  {errors.confirmPassword.message}
+                </Text>
+              )}
+            </View>
+          )}
+          name="confirmPassword"
+        />
+
+        {/* Error message */}
+        {error && (
+          <Text className="text-red-500 text-center">
+            {error}
+          </Text>
+        )}
+
+        {/* Submit button */}
+        <Button
+          className="w-full mt-6"
+          style={{ height: 60, borderRadius: 30 }}
+          disabled={loading}
+          onPress={handleSubmit(onSubmit)}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-foreground text-lg font-bold">
+              Créer mon compte
+            </Text>
+          )}
+        </Button>
+      </View>
+
+      {/* Link to login */}
+      <View className="flex-row justify-center gap-2 mt-6">
+        <Text className="text-muted-foreground">
+          Déjà un compte ?
+        </Text>
+        <TouchableOpacity onPress={() => router.push('/login')}>
+          <Text className="text-primary font-semibold">
+            Se connecter
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
 }

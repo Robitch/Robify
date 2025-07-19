@@ -26,7 +26,7 @@ export default function MusicItem({
 
     useEffect(() => {
         const fetchCurrentTrack = async () => {
-            await TrackPlayer.setupPlayer();
+            // await TrackPlayer.setupPlayer();
             const currentTrack = await TrackPlayer.getCurrentTrack();
             if (currentTrack) {
                 const track = await TrackPlayer.getTrack(currentTrack);
@@ -39,7 +39,11 @@ export default function MusicItem({
 
     const playTrack = async (track: Track) => {
         try {
-            if (currentTrack?.url === track.url) {
+            // Ensure TrackPlayer is set up before trying to play
+            const state = await TrackPlayer.getState();
+            console.log('TrackPlayer state:', state);
+
+            if (currentTrack?.url === track.file_url) {
                 if (isPlaying) {
                     await TrackPlayer.pause();
                 } else {
@@ -50,13 +54,17 @@ export default function MusicItem({
                 await TrackPlayer.reset();
                 await TrackPlayer.add({
                     id: track.id,
-                    url: track.url,
+                    url: track.file_url,
                     title: track.title,
-                    artist: track.artists[0].name,
-                    artwork: track.artwork,
+                    artist: track.user_profiles?.full_name || 'Unknown Artist',
+                    artwork: track.artwork_url,
                 });
                 await TrackPlayer.play();
                 setIsPlaying(true);
+                setCurrentTrack({
+                    ...track,
+                    url: track.file_url
+                });
             }
         } catch (error) {
             console.error('Error playing track:', error);
@@ -65,10 +73,15 @@ export default function MusicItem({
 
 
     return (
-        <View className="flex-row items-center gap-2">
-            <Text className="flex-1">{item.title}</Text>
+        <View className="flex-row items-center gap-2 p-3 bg-card rounded-lg">
+            <View className="flex-1">
+                <Text className="font-semibold text-foreground">{item.title}</Text>
+                <Text className="text-sm text-muted-foreground">
+                    {item.user_profiles?.full_name || 'Unknown Artist'}
+                </Text>
+            </View>
             <Button onPress={() => playTrack(item)}>
-                {/* <Text>{currentTrack?.url === musicUrl && isPlaying ? 'Pause' : 'Play'}</Text> */}
+                <Text>{currentTrack?.url === item.file_url && isPlaying ? 'Pause' : 'Play'}</Text>
             </Button>
             <TouchableOpacity onPress={onRemoveMusic}>
                 <Ionicons name="trash-outline" size={20} className="text-foreground" />

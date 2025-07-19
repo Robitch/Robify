@@ -1,25 +1,30 @@
 export interface Track {
     id: string;
     title: string;
-    artist_id: string;
-    duration: number;
+    user_id: string; // Changed from artist_id to user_id
+    duration: number | null;
     file_url: string;
-    artwork_url?: string;
+    file_path?: string;
+    artwork_url?: string | null;
+    album_id?: string | null;
+    genre?: string | string[] | null;
+    release_year?: number | null;
+    description?: string | null;
+    uploaded_by?: string;
+    bpm?: number | null;
     created_at: string;
     updated_at: string;
     rating?: number;
-    artists?: {
-        name: string;
+    user_profiles?: { // Changed from artists to user_profiles
+        full_name: string;
+        username: string;
     };
+    // Legacy support
+    url?: string;
+    artwork?: string;
 }
 
-export interface Artist {
-    id: string;
-    name: string;
-    bio?: string;
-    image_url?: string;
-    created_at: string;
-}
+// Artist interface removed - using UserProfile directly from auth types
 
 export interface Playlist {
     id: string;
