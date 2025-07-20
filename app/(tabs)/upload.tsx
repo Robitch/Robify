@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/provider/AuthProvider';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { cn } from '~/lib/utils';
-import { Album, AlbumType } from '~/types';
+import { Album, AlbumType, VersionType } from '~/types';
 import AlbumPicker from '@/components/AlbumPicker';
 import { UserSelector } from '@/components/UserSelector';
 
@@ -18,6 +18,8 @@ interface UploadForm {
     title: string;
     genre: string;
     track_number?: number;
+    initialVersionType: VersionType;
+    versionName: string;
 }
 
 interface UserProfile {
@@ -41,6 +43,8 @@ export default function Upload() {
         title: '',
         genre: '',
         track_number: 1,
+        initialVersionType: VersionType.DEMO,
+        versionName: 'Version initiale',
     });
     const [selectedFile, setSelectedFile] = useState<DocumentPicker.DocumentPickerResult | null>(null);
     const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
@@ -160,6 +164,24 @@ export default function Upload() {
 
             if (trackError) throw trackError;
 
+            setUploadProgress(80);
+
+            // Créer la première version avec les colonnes disponibles
+            const versionPayload = {
+                track_id: track.id,
+                version_name: form.versionName,
+                file_url: publicUrl,
+                duration: 0,
+                is_primary: true,
+                version_notes: `Type: ${form.initialVersionType} - Première version uploadée`,
+            };
+
+            const { error: versionError } = await supabase
+                .from('track_versions')
+                .insert(versionPayload);
+
+            if (versionError) throw versionError;
+
             setUploadProgress(100);
             setSuccess(true);
 
@@ -168,6 +190,8 @@ export default function Upload() {
                 title: '',
                 genre: '',
                 track_number: 1,
+                initialVersionType: VersionType.DEMO,
+                versionName: 'Version initiale',
             });
             setSelectedFile(null);
             setSelectedUsers([]);
@@ -180,7 +204,7 @@ export default function Upload() {
 
             Alert.alert(
                 'Upload réussi !',
-                `Le morceau "${form.title}"${albumText} a été ajouté avec succès.`,
+                `Le morceau "${form.title}"${albumText} a été ajouté avec la version "${form.versionName}" (${form.initialVersionType}).`,
                 [{ text: 'OK' }]
             );
         } catch (err) {
@@ -346,6 +370,83 @@ export default function Upload() {
                             />
                         )}
 
+                        {/* Version Settings */}
+                        <View>
+                            <Text className="text-sm font-medium text-foreground mb-3">
+                                Version initiale
+                            </Text>
+                            <View className="space-y-3">
+                                {/* Version Name */}
+                                <Input
+                                    label="Nom de la version"
+                                    value={form.versionName}
+                                    onChangeText={(text) => setForm(prev => ({ ...prev, versionName: text }))}
+                                    placeholder="Ex: Version initiale"
+                                    leftIcon="create-outline"
+                                />
+                                
+                                {/* Version Type Selector */}
+                                <View>
+                                    <Text className="text-sm font-medium text-foreground mb-2">
+                                        Type de version
+                                    </Text>
+                                    <ScrollView 
+                                        horizontal 
+                                        showsHorizontalScrollIndicator={false}
+                                        contentContainerStyle={{ paddingHorizontal: 4 }}
+                                    >
+                                        <View className="flex-row gap-2">
+                                            {[
+                                                { type: VersionType.DEMO, label: 'Demo', icon: 'create-outline' },
+                                                { type: VersionType.ROUGH_MIX, label: 'Rough Mix', icon: 'build-outline' },
+                                                { type: VersionType.FINAL_MIX, label: 'Final Mix', icon: 'checkmark-circle-outline' },
+                                                { type: VersionType.LIVE, label: 'Live', icon: 'mic-outline' },
+                                                { type: VersionType.ACOUSTIC, label: 'Acoustic', icon: 'musical-note-outline' },
+                                            ].map((versionType) => (
+                                                <Pressable
+                                                    key={versionType.type}
+                                                    onPress={() => setForm(prev => ({ ...prev, initialVersionType: versionType.type }))}
+                                                    style={{
+                                                        paddingHorizontal: 16,
+                                                        paddingVertical: 12,
+                                                        borderRadius: 12,
+                                                        borderWidth: 1,
+                                                        borderColor: form.initialVersionType === versionType.type 
+                                                            ? '#10b981' 
+                                                            : (isDarkColorScheme ? '#374151' : '#d1d5db'),
+                                                        backgroundColor: form.initialVersionType === versionType.type 
+                                                            ? (isDarkColorScheme ? '#064e3b20' : '#d1fae520')
+                                                            : 'transparent',
+                                                        minWidth: 80,
+                                                    }}
+                                                >
+                                                    <View className="items-center">
+                                                        <Ionicons
+                                                            name={versionType.icon as any}
+                                                            size={20}
+                                                            color={form.initialVersionType === versionType.type 
+                                                                ? '#10b981' 
+                                                                : (isDarkColorScheme ? '#9ca3af' : '#6b7280')}
+                                                            style={{ marginBottom: 4 }}
+                                                        />
+                                                        <Text 
+                                                            className={cn(
+                                                                "text-xs font-medium text-center",
+                                                                form.initialVersionType === versionType.type 
+                                                                    ? "text-primary" 
+                                                                    : "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {versionType.label}
+                                                        </Text>
+                                                    </View>
+                                                </Pressable>
+                                            ))}
+                                        </View>
+                                    </ScrollView>
+                                </View>
+                            </View>
+                        </View>
 
                         {/* Upload Progress */}
                         {isUploading && uploadProgress > 0 && (

@@ -12,7 +12,8 @@
       "mcp__supabase__generate_typescript_types",
       "Bash(find:*)",
       "Bash(touch:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "mcp__supabase__list_tables"
     ],
     "deny": []
   },

@@ -1,11 +1,15 @@
-import React from 'react';
-import { View, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Dimensions, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/ui/text';
-import { Track } from '~/types';
+import { Track, TrackVersion, VersionType } from '~/types';
 import TrackPlayer, { useActiveTrack, useIsPlaying } from 'react-native-track-player';
 import { Image } from 'expo-image';
 import { useColorScheme } from '~/lib/useColorScheme';
+import { useTrackVersions } from '@/store/versionsStore';
+import VersionUploadModal from './VersionUploadModal';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/provider/AuthProvider';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -21,17 +25,57 @@ interface MusicItemProps {
     onRemoveMusic: () => void;
     showArtwork?: boolean;
     compact?: boolean;
+    onVersionAdded?: () => void;
 }
+
+const VERSION_TYPE_COLORS = {
+    [VersionType.DEMO]: '#f59e0b',
+    [VersionType.ROUGH_MIX]: '#8b5cf6',
+    [VersionType.FINAL_MIX]: '#10b981',
+    [VersionType.REMASTER]: '#06b6d4',
+    [VersionType.REMIX]: '#ec4899',
+    [VersionType.RADIO_EDIT]: '#f97316',
+    [VersionType.EXTENDED_MIX]: '#3b82f6',
+    [VersionType.LIVE]: '#ef4444',
+    [VersionType.ACOUSTIC]: '#84cc16',
+    [VersionType.INSTRUMENTAL]: '#6366f1',
+};
+
+const getVersionTypeFromNotes = (notes: string | null): VersionType => {
+    if (!notes) return VersionType.DEMO;
+    const lowerNotes = notes.toLowerCase();
+    
+    if (lowerNotes.includes('final')) return VersionType.FINAL_MIX;
+    if (lowerNotes.includes('remix')) return VersionType.REMIX;
+    if (lowerNotes.includes('live')) return VersionType.LIVE;
+    if (lowerNotes.includes('acoustic')) return VersionType.ACOUSTIC;
+    if (lowerNotes.includes('rough')) return VersionType.ROUGH_MIX;
+    if (lowerNotes.includes('radio')) return VersionType.RADIO_EDIT;
+    if (lowerNotes.includes('extended')) return VersionType.EXTENDED_MIX;
+    if (lowerNotes.includes('remaster')) return VersionType.REMASTER;
+    if (lowerNotes.includes('instrumental')) return VersionType.INSTRUMENTAL;
+    
+    return VersionType.DEMO;
+};
 
 export default function MusicItem({
     item,
     onRemoveMusic,
     showArtwork = true,
     compact = false,
+    onVersionAdded,
 }: MusicItemProps) {
     const { isDarkColorScheme } = useColorScheme();
+    const { user } = useAuth();
     const activeTrack = useActiveTrack();
     const { playing } = useIsPlaying();
+    
+    // States for version management
+    const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+    const [showVersionModal, setShowVersionModal] = useState(false);
+    const [activeVersion, setActiveVersion] = useState<TrackVersion | null>(null);
+    const [versionsCount, setVersionsCount] = useState(0);
+    const [canAddVersion, setCanAddVersion] = useState(false);
     
     // States pour animations
     const scale = useSharedValue(1);
@@ -40,6 +84,33 @@ export default function MusicItem({
     // Vérifier si cette track est celle qui joue actuellement
     const isCurrentTrack = activeTrack?.url === item.file_url;
     const isPlaying = isCurrentTrack && playing;
+    
+    // Load track versions on mount
+    useEffect(() => {
+        loadTrackVersions();
+    }, [item.id]);
+    
+    const loadTrackVersions = async () => {
+        try {
+            const { data: versions, error } = await supabase
+                .from('track_versions')
+                .select('*')
+                .eq('track_id', item.id)
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
+            const activeVer = versions?.find(v => v.is_primary) || versions?.[0];
+            setActiveVersion(activeVer || null);
+            setVersionsCount(versions?.length || 0);
+            
+            // Vérifier si l'utilisateur peut ajouter une version (propriétaire ou collaborateur)
+            setCanAddVersion(item.user_id === user?.id);
+            
+        } catch (error) {
+            console.error('Error loading versions:', error);
+        }
+    };
 
     // Animations
     const itemAnimatedStyle = useAnimatedStyle(() => ({
@@ -179,9 +250,40 @@ export default function MusicItem({
                         </TouchableOpacity>
                     </Animated.View>
 
+                    {/* Version Badge */}
+                    {activeVersion && (
+                        <View 
+                            style={{
+                                backgroundColor: VERSION_TYPE_COLORS[getVersionTypeFromNotes(activeVersion.version_notes)] + '20',
+                                borderColor: VERSION_TYPE_COLORS[getVersionTypeFromNotes(activeVersion.version_notes)],
+                                borderWidth: 1,
+                            }}
+                            className="px-2 py-1 rounded-full mr-2"
+                        >
+                            <Text 
+                                style={{
+                                    color: VERSION_TYPE_COLORS[getVersionTypeFromNotes(activeVersion.version_notes)],
+                                }}
+                                className="text-xs font-medium"
+                            >
+                                {activeVersion.version_name}
+                            </Text>
+                            {versionsCount > 1 && (
+                                <Text 
+                                    style={{
+                                        color: VERSION_TYPE_COLORS[getVersionTypeFromNotes(activeVersion.version_notes)],
+                                    }}
+                                    className="text-xs opacity-70"
+                                >
+                                    {' '}+{versionsCount - 1}
+                                </Text>
+                            )}
+                        </View>
+                    )}
+
                     {/* More Options */}
                     <TouchableOpacity
-                        onPress={onRemoveMusic}
+                        onPress={() => setShowOptionsMenu(true)}
                         className="w-10 h-10 items-center justify-center ml-2"
                         activeOpacity={0.7}
                     >
@@ -194,6 +296,175 @@ export default function MusicItem({
                 </View>
 
             </TouchableOpacity>
+            
+            {/* Options Menu Modal */}
+            <Modal
+                visible={showOptionsMenu}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowOptionsMenu(false)}
+            >
+                <TouchableOpacity 
+                    style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
+                    activeOpacity={1}
+                    onPress={() => setShowOptionsMenu(false)}
+                >
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
+                        <TouchableOpacity activeOpacity={1}>
+                            <View 
+                                style={{
+                                    backgroundColor: isDarkColorScheme ? '#1f2937' : '#ffffff',
+                                    borderRadius: 16,
+                                    padding: 4,
+                                    minWidth: 200,
+                                    shadowColor: '#000',
+                                    shadowOffset: { width: 0, height: 4 },
+                                    shadowOpacity: 0.3,
+                                    shadowRadius: 8,
+                                    elevation: 8,
+                                }}
+                            >
+                                {/* Add Version Option */}
+                                {canAddVersion && (
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setShowOptionsMenu(false);
+                                            setShowVersionModal(true);
+                                        }}
+                                        style={{
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            padding: 16,
+                                            borderRadius: 12,
+                                        }}
+                                        activeOpacity={0.7}
+                                    >
+                                        <View 
+                                            style={{
+                                                width: 32,
+                                                height: 32,
+                                                borderRadius: 16,
+                                                backgroundColor: '#10b981',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                marginRight: 12,
+                                            }}
+                                        >
+                                            <Ionicons name="add" size={16} color="#ffffff" />
+                                        </View>
+                                        <View className="flex-1">
+                                            <Text className="text-foreground font-medium">
+                                                Ajouter une version
+                                            </Text>
+                                            <Text className="text-muted-foreground text-xs">
+                                                Créer une nouvelle version de ce morceau
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )}
+                                
+                                {/* View Versions Option */}
+                                {versionsCount > 1 && (
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setShowOptionsMenu(false);
+                                            // TODO: Navigate to versions list
+                                        }}
+                                        style={{
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            padding: 16,
+                                            borderRadius: 12,
+                                        }}
+                                        activeOpacity={0.7}
+                                    >
+                                        <View 
+                                            style={{
+                                                width: 32,
+                                                height: 32,
+                                                borderRadius: 16,
+                                                backgroundColor: isDarkColorScheme ? '#374151' : '#f3f4f6',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                marginRight: 12,
+                                            }}
+                                        >
+                                            <Ionicons 
+                                                name="list" 
+                                                size={16} 
+                                                color={isDarkColorScheme ? '#9ca3af' : '#6b7280'} 
+                                            />
+                                        </View>
+                                        <View className="flex-1">
+                                            <Text className="text-foreground font-medium">
+                                                Voir toutes les versions
+                                            </Text>
+                                            <Text className="text-muted-foreground text-xs">
+                                                {versionsCount} version{versionsCount > 1 ? 's' : ''} disponible{versionsCount > 1 ? 's' : ''}
+                                            </Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                )}
+                                
+                                {/* Remove Option */}
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setShowOptionsMenu(false);
+                                        onRemoveMusic();
+                                    }}
+                                    style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        padding: 16,
+                                        borderRadius: 12,
+                                    }}
+                                    activeOpacity={0.7}
+                                >
+                                    <View 
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: 16,
+                                            backgroundColor: '#ef444420',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            marginRight: 12,
+                                        }}
+                                    >
+                                        <Ionicons name="trash-outline" size={16} color="#ef4444" />
+                                    </View>
+                                    <View className="flex-1">
+                                        <Text style={{ color: '#ef4444' }} className="font-medium">
+                                            Supprimer
+                                        </Text>
+                                        <Text className="text-muted-foreground text-xs">
+                                            Retirer de la liste
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
+            
+            {/* Version Upload Modal */}
+            <VersionUploadModal
+                visible={showVersionModal}
+                onClose={() => setShowVersionModal(false)}
+                trackId={item.id}
+                trackTitle={item.title}
+                onVersionCreated={(version) => {
+                    setShowVersionModal(false);
+                    loadTrackVersions(); // Refresh versions
+                    onVersionAdded?.(); // Callback parent
+                    Alert.alert(
+                        'Version ajoutée !',
+                        `La version "${version.version_name}" a été ajoutée avec succès.`,
+                        [{ text: 'OK' }]
+                    );
+                }}
+            />
         </Animated.View>
     );
 }
