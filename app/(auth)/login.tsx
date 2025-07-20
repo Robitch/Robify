@@ -17,12 +17,12 @@ interface LoginFormData {
 export default function Login() {
   const insets = useSafeAreaInsets();
   const { signIn, loading, error, clearError } = useAuth();
-  
+
   const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
     clearError();
-    
+
     try {
       await signIn(data.email, data.password);
       // Navigation will be handled by the auth state change in _layout.tsx

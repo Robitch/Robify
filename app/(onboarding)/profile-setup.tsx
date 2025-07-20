@@ -24,7 +24,7 @@ export default function ProfileSetup() {
   const { updateProfile, userProfile, loading } = useAuth();
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  
+
   const { control, handleSubmit, formState: { errors } } = useForm<ProfileSetupFormData>();
 
   const pickImage = async () => {
@@ -42,7 +42,7 @@ export default function ProfileSetup() {
 
   const onSubmit = async (data: ProfileSetupFormData) => {
     setIsUploading(true);
-    
+
     try {
       await updateProfile({
         bio: data.bio || undefined,
@@ -52,7 +52,7 @@ export default function ProfileSetup() {
         spotify: data.spotify || undefined,
         avatar_url: avatarUri || undefined,
       });
-      
+
       Alert.alert(
         'Profil configuré !',
         'Votre profil a été configuré avec succès. Bienvenue sur Robify !',
@@ -91,7 +91,7 @@ export default function ProfileSetup() {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1 px-6"
       style={{
         paddingTop: insets.top + 40,
@@ -126,7 +126,7 @@ export default function ProfileSetup() {
             </View>
           )}
         </TouchableOpacity>
-        
+
         <TouchableOpacity onPress={pickImage} className="flex-row items-center gap-2">
           <Ionicons name="camera" size={20} className="text-primary" />
           <Text className="text-primary font-semibold">
@@ -142,15 +142,11 @@ export default function ProfileSetup() {
           render={({ field: { onChange, onBlur, value } }) => (
             <View>
               <Text className="text-sm font-semibold mb-2">
-                Bio {userProfile?.role === 'artist' && '(Décrivez votre style musical)'}
+                Bio (Décrivez votre style musical)
               </Text>
               <Input
                 className="h-24"
-                placeholder={
-                  userProfile?.role === 'artist' 
-                    ? "Artiste hip-hop de Paris, je mélange les sonorités urbaines avec des influences jazz..."
-                    : "Passionné de musique, j'adore découvrir de nouveaux artistes et styles..."
-                }
+                placeholder={"Artiste hip-hop de Paris, je mélange les sonorités urbaines avec des influences jazz..."}
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
@@ -181,66 +177,63 @@ export default function ProfileSetup() {
           name="location"
         />
 
-        {userProfile?.role === 'artist' && (
-          <>
-            <Controller
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View>
-                  <Text className="text-sm font-semibold mb-2">
-                    Site web
-                  </Text>
-                  <Input
-                    placeholder="https://monsite.com"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="url"
-                    autoCapitalize="none"
-                  />
-                </View>
-              )}
-              name="website"
-            />
 
-            <Controller
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View>
-                  <Text className="text-sm font-semibold mb-2">
-                    Instagram
-                  </Text>
-                  <Input
-                    placeholder="@moncompte"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    autoCapitalize="none"
-                  />
-                </View>
-              )}
-              name="instagram"
-            />
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Text className="text-sm font-semibold mb-2">
+                Site web
+              </Text>
+              <Input
+                placeholder="https://monsite.com"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                keyboardType="url"
+                autoCapitalize="none"
+              />
+            </View>
+          )}
+          name="website"
+        />
 
-            <Controller
-              control={control}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <View>
-                  <Text className="text-sm font-semibold mb-2">
-                    Spotify
-                  </Text>
-                  <Input
-                    placeholder="Nom d'artiste sur Spotify"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                </View>
-              )}
-              name="spotify"
-            />
-          </>
-        )}
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Text className="text-sm font-semibold mb-2">
+                Instagram
+              </Text>
+              <Input
+                placeholder="@moncompte"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                autoCapitalize="none"
+              />
+            </View>
+          )}
+          name="instagram"
+        />
+
+        <Controller
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View>
+              <Text className="text-sm font-semibold mb-2">
+                Spotify
+              </Text>
+              <Input
+                placeholder="Nom d'artiste sur Spotify"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+              />
+            </View>
+          )}
+          name="spotify"
+        />
 
         {/* Submit button */}
         <Button

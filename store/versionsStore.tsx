@@ -60,7 +60,12 @@ export const useVersionsStore = create<VersionsState>()((set, get) => ({
 
       if (error) throw error;
 
-      const versionsArray = versions || [];
+      // Type cast version_type to VersionType enum
+      const versionsArray = (versions || []).map(version => ({
+        ...version,
+        version_type: version.version_type as VersionType
+      })) as TrackVersion[];
+      
       const activeVersion = versionsArray.find(v => v.is_primary);
 
       set((state) => ({

@@ -66,6 +66,7 @@ export interface Database {
           id: string
           role: string
           track_id: string | null
+          version_id: string | null
         }
         Insert: {
           user_id?: string | null
@@ -73,6 +74,7 @@ export interface Database {
           id?: string
           role: string
           track_id?: string | null
+          version_id?: string | null
         }
         Update: {
           user_id?: string | null
@@ -80,6 +82,7 @@ export interface Database {
           id?: string
           role?: string
           track_id?: string | null
+          version_id?: string | null
         }
         Relationships: [
           {
@@ -94,6 +97,13 @@ export interface Database {
             columns: ["track_id"]
             isOneToOne: false
             referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collaborations_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "track_versions"
             referencedColumns: ["id"]
           }
         ]
@@ -425,6 +435,11 @@ export interface Database {
           updated_at: string
           version_name: string
           version_notes: string | null
+          version_type: string
+          version_number: string
+          file_size: number | null
+          quality: string | null
+          is_public: boolean | null
         }
         Insert: {
           created_at?: string
@@ -436,6 +451,11 @@ export interface Database {
           updated_at?: string
           version_name: string
           version_notes?: string | null
+          version_type: string
+          version_number: string
+          file_size?: number | null
+          quality?: string | null
+          is_public?: boolean | null
         }
         Update: {
           created_at?: string
@@ -447,6 +467,11 @@ export interface Database {
           updated_at?: string
           version_name?: string
           version_notes?: string | null
+          version_type?: string
+          version_number?: string
+          file_size?: number | null
+          quality?: string | null
+          is_public?: boolean | null
         }
         Relationships: [
           {

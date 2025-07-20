@@ -1,18 +1,17 @@
-import { useEffect } from 'react';
 import { Stack, useRouter } from 'expo-router';
-// import { useAuth } from '@/provider/AuthProvider';
-import { options } from '~/lib/useBackButton';
+import { useEffect } from 'react';
+import { useAuth } from '~/provider/AuthProvider';
 
 
 export default function AuthLayout() {
-    // const router = useRouter();
-    // const { session } = useAuth();
+    const router = useRouter();
+    const { session } = useAuth();
 
-    // useEffect(() => {
-    //     if (session) {
-    //         router.replace("/home");
-    //     }
-    // }, [session]);
+    useEffect(() => {
+        if (session) {
+            router.replace("/home");
+        }
+    }, [session]);
 
     return (
         <Stack screenOptions={{}}>

@@ -1,19 +1,11 @@
 import * as React from "react";
 import { Pressable, ScrollView, View, RefreshControl } from "react-native";
-import FileUpload from "@/components/FileUpload";
-import { useAuth } from "@/provider/AuthProvider";
 import MusicItem from "@/components/MusicItem";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { FileObject } from "@supabase/storage-js";
-import { useAudioStore } from "@/store/audio";
 import { Track } from "~/types";
-import MusicPlayer from "../MusicPlayer";
 import { Text } from "~/components/ui/text";
-import { Image } from "expo-image";
-import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-// import TestPlayer from "@/components/TestPlayer";
 
 type SortField = 'title' | 'artist' | 'duration';
 type SortOrder = 'asc' | 'desc';
@@ -112,7 +104,7 @@ export default function Home() {
             Vos morceaux
           </Text>
           <Text className="text-base text-muted-foreground">
-            {tracks.length} morceau{tracks.length > 1 ? 's' : ''} disponible{tracks.length > 1 ? 's' : ''}
+            {tracks.length} morceau{tracks.length > 1 ? 'x' : ''} disponible{tracks.length > 1 ? 's' : ''}
           </Text>
         </View>
 

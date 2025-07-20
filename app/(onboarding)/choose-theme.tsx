@@ -1,4 +1,3 @@
-import { LoginForm } from "@/components/LoginForm";
 import { View } from "react-native";
 import { Image, ImageBackground } from "expo-image";
 import { Text } from "~/components/ui/text";
@@ -7,7 +6,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useColorScheme } from "~/lib/useColorScheme";
 import { cn } from "~/lib/utils";
-import { cssInterop } from "nativewind";
 import { BlurView } from "expo-blur";
 import { Link } from "expo-router";
 
@@ -18,13 +16,6 @@ export default function ChooseTheme() {
     function toggleColorScheme(theme: "light" | "dark") {
         setColorScheme(theme);
     }
-
-    // cssInterop(Ionicons, {
-    //     className: {
-    //         target: "color",
-    //         nativeStyleToProp: { color: true },
-    //     }
-    // });
 
     return (
         <ImageBackground

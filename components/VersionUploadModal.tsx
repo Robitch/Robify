@@ -88,30 +88,46 @@ export default function VersionUploadModal({
     }
   }, [visible]);
 
-  // Charger les collaborateurs existants du track
+  // Charger les collaborateurs de la dernière version comme base
   const loadExistingCollaborators = async () => {
     try {
+      // 1. Récupérer la dernière version pour ce track
+      const { data: latestVersion } = await supabase
+        .from('track_versions')
+        .select('id')
+        .eq('track_id', trackId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (!latestVersion) {
+        // Pas de versions existantes, laisser la liste vide
+        setSelectedUsers([]);
+        return;
+      }
+
+      // 2. Récupérer les collaborateurs de cette version
       const { data: collaborations, error } = await supabase
         .from('collaborations')
         .select(`
           user_id,
-          user_profiles!collaborations_user_id_fkey (
+          user_profiles (
             id,
             full_name,
             username,
             avatar_url
           )
         `)
-        .eq('track_id', trackId);
+        .eq('version_id', latestVersion.id);
 
       if (error) throw error;
 
       const existingCollaborators = collaborations?.map(collab => ({
-        id: collab.user_profiles.id,
-        full_name: collab.user_profiles.full_name,
-        username: collab.user_profiles.username,
-        avatar_url: collab.user_profiles.avatar_url,
-      })) || [];
+        id: collab.user_profiles?.id || '',
+        full_name: collab.user_profiles?.full_name || '',
+        username: collab.user_profiles?.username || '',
+        avatar_url: collab.user_profiles?.avatar_url,
+      })).filter(collab => collab.id !== '') || [];
 
       setSelectedUsers(existingCollaborators);
     } catch (error) {

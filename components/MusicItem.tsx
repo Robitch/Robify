@@ -8,6 +8,7 @@ import { Image } from 'expo-image';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { useTrackVersions } from '@/store/versionsStore';
 import VersionUploadModal from './VersionUploadModal';
+import VersionManagerModal from './VersionManagerModal';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/provider/AuthProvider';
 import Animated, {
@@ -73,6 +74,7 @@ export default function MusicItem({
     // States for version management
     const [showOptionsMenu, setShowOptionsMenu] = useState(false);
     const [showVersionModal, setShowVersionModal] = useState(false);
+    const [showVersionManagerModal, setShowVersionManagerModal] = useState(false);
     const [activeVersion, setActiveVersion] = useState<TrackVersion | null>(null);
     const [versionsCount, setVersionsCount] = useState(0);
     const [canAddVersion, setCanAddVersion] = useState(false);
@@ -82,7 +84,9 @@ export default function MusicItem({
     const playButtonScale = useSharedValue(1);
     
     // Vérifier si cette track est celle qui joue actuellement
-    const isCurrentTrack = activeTrack?.url === item.file_url;
+    // Prendre en compte l'URL de la version active ou de la track originale
+    const isCurrentTrack = activeTrack?.url === item.file_url || 
+                          (activeVersion && activeTrack?.url === activeVersion.file_url);
     const isPlaying = isCurrentTrack && playing;
     
     // Load track versions on mount
@@ -100,7 +104,13 @@ export default function MusicItem({
             
             if (error) throw error;
             
-            const activeVer = versions?.find(v => v.is_primary) || versions?.[0];
+            // Type cast version_type to VersionType enum
+            const typedVersions = versions?.map(version => ({
+                ...version,
+                version_type: version.version_type as VersionType
+            })) as TrackVersion[];
+            
+            const activeVer = typedVersions?.find(v => v.is_primary) || typedVersions?.[0];
             setActiveVersion(activeVer || null);
             setVersionsCount(versions?.length || 0);
             
@@ -128,6 +138,29 @@ export default function MusicItem({
                 playButtonScale.value = withSpring(1, { damping: 15 });
             });
 
+            // Récupérer la version par défaut ou la dernière version disponible
+            const { data: versions, error } = await supabase
+                .from('track_versions')
+                .select('*')
+                .eq('track_id', track.id)
+                .order('created_at', { ascending: false });
+
+            // Trouver la version par défaut ou prendre la dernière
+            let trackToPlay = track;
+            let versionToPlay = null;
+            
+            if (!error && versions && versions.length > 0) {
+                versionToPlay = versions.find(v => v.is_primary) || versions[0];
+                if (versionToPlay) {
+                    trackToPlay = {
+                        ...track,
+                        file_url: versionToPlay.file_url,
+                        duration: versionToPlay.duration,
+                        title: `${track.title} (${versionToPlay.version_name})`
+                    };
+                }
+            }
+
             // Vérifier l'état actuel
             const currentActiveTrack = await TrackPlayer.getCurrentTrack();
             const state = await TrackPlayer.getState();
@@ -135,7 +168,7 @@ export default function MusicItem({
             // Si c'est la même track, juste pause/play
             if (currentActiveTrack !== null) {
                 const currentTrackData = await TrackPlayer.getTrack(currentActiveTrack);
-                if (currentTrackData?.url === track.file_url) {
+                if (currentTrackData?.url === trackToPlay.file_url) {
                     if (state === 'playing') {
                         await TrackPlayer.pause();
                     } else {
@@ -145,14 +178,15 @@ export default function MusicItem({
                 }
             }
             
-            // Sinon, charger la nouvelle track
+            // Sinon, charger la nouvelle track avec la bonne version
             await TrackPlayer.reset();
             await TrackPlayer.add({
-                id: track.id,
-                url: track.file_url,
-                title: track.title,
+                id: versionToPlay ? `${track.id}_${versionToPlay.id}` : track.id,
+                url: trackToPlay.file_url,
+                title: trackToPlay.title,
                 artist: track.user_profiles?.full_name || 'Unknown Artist',
                 artwork: track.artwork_url,
+                duration: trackToPlay.duration || 0,
             });
             await TrackPlayer.play();
             
@@ -368,7 +402,7 @@ export default function MusicItem({
                                     <TouchableOpacity
                                         onPress={() => {
                                             setShowOptionsMenu(false);
-                                            // TODO: Navigate to versions list
+                                            setShowVersionManagerModal(true);
                                         }}
                                         style={{
                                             flexDirection: 'row',
@@ -397,7 +431,7 @@ export default function MusicItem({
                                         </View>
                                         <View className="flex-1">
                                             <Text className="text-foreground font-medium">
-                                                Voir toutes les versions
+                                                Gérer les versions
                                             </Text>
                                             <Text className="text-muted-foreground text-xs">
                                                 {versionsCount} version{versionsCount > 1 ? 's' : ''} disponible{versionsCount > 1 ? 's' : ''}
@@ -463,6 +497,16 @@ export default function MusicItem({
                         `La version "${version.version_name}" a été ajoutée avec succès.`,
                         [{ text: 'OK' }]
                     );
+                }}
+            />
+
+            {/* Version Manager Modal */}
+            <VersionManagerModal
+                visible={showVersionManagerModal}
+                onClose={() => setShowVersionManagerModal(false)}
+                track={item}
+                onVersionUpdated={() => {
+                    loadTrackVersions(); // Refresh versions after changes
                 }}
             />
         </Animated.View>

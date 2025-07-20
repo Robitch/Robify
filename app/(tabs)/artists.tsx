@@ -152,8 +152,7 @@ export default function Artists() {
                                         {artist.avatar_url ? (
                                             <Image
                                                 source={{ uri: artist.avatar_url }}
-                                                className="w-full h-full"
-                                                contentFit="cover"
+                                                style={{ width: '100%', height: '100%' }}
                                             />
                                         ) : (
                                             <View className={`w-full h-full ${isDarkColorScheme ? 'bg-gray-700' : 'bg-gray-200'
@@ -161,7 +160,7 @@ export default function Artists() {
                                                 <Ionicons
                                                     name="person"
                                                     size={24}
-                                                    className="text-muted-foreground"
+                                                    color={isDarkColorScheme ? '#fff' : '#000'}
                                                 />
                                             </View>
                                         )}
@@ -187,16 +186,6 @@ export default function Artists() {
                                         className="text-muted-foreground"
                                     />
                                 </View>
-
-                                {/* Bio Preview */}
-                                {artist.bio && (
-                                    <Text
-                                        className="text-sm text-muted-foreground mt-3 leading-5"
-                                        numberOfLines={2}
-                                    >
-                                        {artist.bio}
-                                    </Text>
-                                )}
                             </TouchableOpacity>
                         ))}
                     </View>

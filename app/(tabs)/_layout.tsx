@@ -46,15 +46,6 @@ const TabsLayout = () => {
           tabBarHideOnKeyboard: true,
         }}>
         <Tabs.Screen
-          name="(songs)"
-          options={{
-            title: 'Musique',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="musical-notes-sharp" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="home"
           options={{
             title: 'Accueil',

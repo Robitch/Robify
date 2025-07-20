@@ -166,13 +166,18 @@ export default function Upload() {
 
             setUploadProgress(80);
 
-            // Créer la première version avec les colonnes disponibles
+            // Créer la première version avec les colonnes requises
             const versionPayload = {
                 track_id: track.id,
                 version_name: form.versionName,
+                version_type: form.initialVersionType,
+                version_number: 'v1.0',
                 file_url: publicUrl,
                 duration: 0,
+                file_size: form.file?.size || 0,
+                quality: '320kbps',
                 is_primary: true,
+                is_public: true,
                 version_notes: `Type: ${form.initialVersionType} - Première version uploadée`,
             };
 

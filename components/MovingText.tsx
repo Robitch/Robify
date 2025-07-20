@@ -13,10 +13,10 @@ import Animated, {
 export type MovingTextProps = {
 	text: string
 	animationThreshold: number
-	style?: StyleProps
+	className?: string
 }
 
-export const MovingText = ({ text, animationThreshold, style }: MovingTextProps) => {
+export const MovingText = ({ text, animationThreshold, className }: MovingTextProps) => {
 	const translateX = useSharedValue(0)
 	const shouldAnimate = text.length >= animationThreshold
 
@@ -52,8 +52,8 @@ export const MovingText = ({ text, animationThreshold, style }: MovingTextProps)
 	return (
 		<Animated.Text
 			numberOfLines={1}
+			className={className}
 			style={[
-				style,
 				animatedStyle,
 				shouldAnimate && {
 					width: 9999, // preventing the ellipsis from appearing

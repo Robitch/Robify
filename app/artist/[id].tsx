@@ -139,7 +139,7 @@ export default function ArtistProfile() {
                 <Ionicons name="person-outline" size={64} className="text-muted-foreground mb-4" />
                 <Text className="text-lg font-semibold mb-2 text-center">Artiste introuvable</Text>
                 <Text className="text-muted-foreground text-center mb-4">{error}</Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                     onPress={() => router.back()}
                     className="px-6 py-3 bg-primary rounded-lg"
                 >
@@ -168,15 +168,15 @@ export default function ArtistProfile() {
                     {artist.avatar_url ? (
                         <Image
                             source={{ uri: artist.avatar_url }}
-                            className="w-full h-full"
+                            style={{ width: '100%', height: '100%' }}
                             contentFit="cover"
                         />
                     ) : (
                         <View className={`w-full h-full ${isDarkColorScheme ? 'bg-gray-800' : 'bg-gray-200'} items-center justify-center`}>
-                            <Ionicons 
-                                name="person" 
-                                size={120} 
-                                className="text-muted-foreground" 
+                            <Ionicons
+                                name="person"
+                                size={120}
+                                className="text-muted-foreground"
                             />
                         </View>
                     )}
@@ -236,8 +236,8 @@ export default function ArtistProfile() {
                         <Text className="text-lg font-semibold text-foreground mb-4">
                             Albums
                         </Text>
-                        <ScrollView 
-                            horizontal 
+                        <ScrollView
+                            horizontal
                             showsHorizontalScrollIndicator={false}
                             className="gap-4"
                         >
@@ -256,13 +256,12 @@ export default function ArtistProfile() {
                                                 contentFit="cover"
                                             />
                                         ) : (
-                                            <View className={`w-full h-full ${
-                                                isDarkColorScheme ? 'bg-gray-700' : 'bg-gray-200'
-                                            } items-center justify-center`}>
-                                                <Ionicons 
-                                                    name="musical-note" 
-                                                    size={32} 
-                                                    className="text-muted-foreground" 
+                                            <View className={`w-full h-full ${isDarkColorScheme ? 'bg-gray-700' : 'bg-gray-200'
+                                                } items-center justify-center`}>
+                                                <Ionicons
+                                                    name="musical-note"
+                                                    size={32}
+                                                    className="text-muted-foreground"
                                                 />
                                             </View>
                                         )}

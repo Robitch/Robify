@@ -32,10 +32,10 @@ export default function AuthOptions() {
             {/* Button */}
             <View className='flex-row gap-10'>
                 <Link href="/(auth)/register" asChild>
-                    <Button className='flex-1' style={{ height: 73, borderRadius: 30 }}><Text className="text-foreground" style={{ fontSize: 21, fontWeight: "bold" }}>S'inscrire</Text></Button>
+                    <Button className='flex-1' style={{ height: 73, borderRadius: 30 }}><Text className="text-foreground" style={{ fontSize: 18, fontWeight: "bold" }}>S'inscrire</Text></Button>
                 </Link>
                 <Link href="/(auth)/login" asChild>
-                    <Button variant="link" className='flex-1' style={{ height: 73, borderRadius: 30 }}><Text className="text-foreground" style={{ fontSize: 21, fontWeight: "bold" }}>Se connecter</Text></Button>
+                    <Button variant="link" className='flex-1' style={{ height: 73, borderRadius: 30 }}><Text className="text-foreground" style={{ fontSize: 18, fontWeight: "bold" }}>Se connecter</Text></Button>
                 </Link>
             </View>
         </View>

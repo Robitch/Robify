@@ -53,10 +53,16 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
 
       if (versionsError) throw versionsError;
 
-      setVersions(versionsData || []);
+      // Type cast version_type to VersionType enum
+      const typedVersions = (versionsData || []).map(version => ({
+        ...version,
+        version_type: version.version_type as VersionType
+      })) as TrackVersion[];
+
+      setVersions(typedVersions);
       
       // Définir la version active
-      const primary = versionsData?.find(v => v.is_primary) || versionsData?.[0];
+      const primary = typedVersions.find(v => v.is_primary) || typedVersions[0];
       setActiveVersionState(primary || null);
 
     } catch (err) {
@@ -114,14 +120,19 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
 
       const versionCount = existingVersions.data?.length || 0;
 
-      // 4. Créer l'enregistrement de version (adapter au schéma réel)
+      // 4. Créer l'enregistrement de version (nouveau schéma)
       const versionPayload = {
         track_id: targetTrackId,
         version_name: data.version_name,
+        version_type: data.version_type,
+        version_number: `v${versionCount + 1}.0`,
         file_url: publicUrl,
         duration: null, // TODO: Extraire la durée
+        file_size: data.file.size,
+        quality: '320kbps', // Valeur par défaut
         is_primary: versions.length === 0, // Première version = primaire
-        version_notes: `Type: ${data.version_type} - ${data.version_notes || 'Nouvelle version'}`,
+        is_public: data.is_public,
+        version_notes: data.version_notes || 'Nouvelle version',
       };
 
       const { data: newVersion, error: versionError } = await supabase
@@ -132,10 +143,17 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
 
       if (versionError) throw versionError;
 
-      // 5. Ajouter les collaborateurs si fournis
+      // Type cast the new version
+      const typedNewVersion = {
+        ...newVersion,
+        version_type: newVersion.version_type as VersionType
+      } as TrackVersion;
+
+      // 5. Ajouter les collaborateurs spécifiques à cette version
       if (data.collaborators.length > 0) {
         const collaboratorsPayload = data.collaborators.map(userId => ({
           track_id: targetTrackId,
+          version_id: typedNewVersion.id, // NOUVEAU: lié à la version spécifique
           user_id: userId,
           role: 'Artist', // Rôle par défaut
         }));
@@ -146,13 +164,13 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
       }
 
       // 6. Mettre à jour l'état local
-      setVersions(prev => [newVersion, ...prev]);
+      setVersions(prev => [typedNewVersion, ...prev]);
       
-      if (newVersion.is_primary) {
-        setActiveVersionState(newVersion);
+      if (typedNewVersion.is_primary) {
+        setActiveVersionState(typedNewVersion);
       }
 
-      return newVersion;
+      return typedNewVersion;
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la création');
@@ -232,7 +250,11 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
           .remove([`audio/versions/${filePathFromUrl}`]);
       }
 
-      // 2. Supprimer les collaborations liées (pas nécessaire car liées au track, pas à la version)
+      // 2. Supprimer les collaborations liées à cette version spécifique
+      await supabase
+        .from('collaborations')
+        .delete()
+        .eq('version_id', versionId);
 
       // 3. Supprimer la version
       const { error } = await supabase

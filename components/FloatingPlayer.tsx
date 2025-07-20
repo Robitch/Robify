@@ -37,8 +37,8 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 	const bottomOffset = isInTabsLayout ? 78 : insets.bottom + 16
 
 	// Masquer le FloatingPlayer si on est sur la page PlayerScreen
-	const isOnPlayerScreen = segments.includes('PlayerScreen')
-	
+	const isOnPlayerScreen = (segments as string[]).includes('PlayerScreen')
+
 	console.log('Current segments:', segments)
 	console.log('Is on PlayerScreen:', isOnPlayerScreen)
 
@@ -73,7 +73,7 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 		if (activeTrack && hasLoadedTrack) {
 			// Réinitialiser d'abord les valeurs pour une nouvelle apparition propre
 			resetAnimationValues()
-			
+
 			// Puis lancer l'animation d'entrée
 			scale.value = withSpring(1, {
 				damping: 15,
@@ -143,7 +143,7 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 			// Permettre le mouvement dans toutes les directions
 			panX.value = event.translationX * 0.5
 			panY.value = event.translationY
-			
+
 			// Réduire l'opacité quand on swipe vers le bas
 			if (event.translationY > 0) {
 				opacity.value = interpolate(
@@ -164,12 +164,12 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 				translateY.value = withTiming(150, { duration: 300 })
 				opacity.value = withTiming(0, { duration: 300 })
 				scale.value = withTiming(0.8, { duration: 300 })
-				
+
 				// Clear la queue après l'animation
 				runOnJS(handleDismissPlayer)()
 				return
 			}
-			
+
 			// Si swipe vers le haut assez fort, ouvrir le player
 			if (event.translationY < -50 && event.velocityY < -500) {
 				runOnJS(handlePress)()
@@ -211,7 +211,7 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 	return (
 		<PanGestureHandler onGestureEvent={panGestureHandler}>
 			<Animated.View>
-				<TapGestureHandler onGestureEvent={tapGestureHandler}>
+				<TapGestureHandler onGestureEvent={() => tapGestureHandler}>
 					<Animated.View
 						className={`flex-row items-center p-4 rounded-2xl mx-4 mb-2 ${isDarkColorScheme ? 'bg-gray-900/95' : 'bg-white/95'
 							}`}
@@ -354,25 +354,25 @@ const PlayerControlsFloating = () => {
 			className="flex-row items-center space-x-3"
 			style={controlsAnimatedStyle}
 		>
-			<TapGestureHandler onGestureEvent={playPauseGestureHandler}>
+			<TapGestureHandler onGestureEvent={() => playPauseGestureHandler}>
 				<Animated.View>
 					<TouchableOpacity activeOpacity={0.7}>
-						<Ionicons 
-							name={playing ? 'pause-circle' : 'play-circle'} 
+						<Ionicons
+							name={playing ? 'pause-circle' : 'play-circle'}
 							size={24}
-							className="text-white" 
+							className="text-white"
 						/>
 					</TouchableOpacity>
 				</Animated.View>
 			</TapGestureHandler>
-			
-			<TapGestureHandler onGestureEvent={skipGestureHandler}>
+
+			<TapGestureHandler onGestureEvent={() => skipGestureHandler}>
 				<Animated.View>
 					<TouchableOpacity activeOpacity={0.7}>
-						<Ionicons 
-							name="play-skip-forward" 
+						<Ionicons
+							name="play-skip-forward"
 							size={22}
-							className="text-white" 
+							className="text-white"
 						/>
 					</TouchableOpacity>
 				</Animated.View>
