@@ -137,7 +137,7 @@ export function UserSelector({
                                             {user.full_name}
                                         </Text>
                                         <Pressable onPress={() => removeUser(user.id)}>
-                                            <Ionicons name="close" size={14} className="text-white" />
+                                            <Ionicons name="close" size={14} color="#ffffff" />
                                         </Pressable>
                                     </View>
                                 ))}
@@ -147,14 +147,14 @@ export function UserSelector({
                     <Ionicons
                         name="chevron-down"
                         size={20}
-                        className={isDarkColorScheme ? 'text-gray-400' : 'text-gray-500'}
+                        color={isDarkColorScheme ? '#9ca3af' : '#6b7280'}
                     />
                 </View>
             </Pressable>
 
             {error && (
                 <Text className="text-sm mt-1 text-red-500">
-                    {error}
+                    {error} 
                 </Text>
             )}
 
@@ -184,7 +184,7 @@ export function UserSelector({
                             size="icon"
                             onPress={() => setIsOpen(false)}
                         >
-                            <Ionicons name="close" size={24} className={isDarkColorScheme ? 'text-gray-50' : 'text-gray-900'} />
+                            <Ionicons name="close" size={24} color={isDarkColorScheme ? '#f9fafb' : '#111827'} />
                         </Button>
                     </View>
 
@@ -247,7 +247,7 @@ export function UserSelector({
                                                         <Ionicons
                                                             name="person"
                                                             size={20}
-                                                            className={isDarkColorScheme ? 'text-gray-400' : 'text-gray-500'}
+                                                            color={isDarkColorScheme ? '#9ca3af' : '#6b7280'}
                                                         />
                                                     )}
                                                 </View>
@@ -278,7 +278,7 @@ export function UserSelector({
                                                     }}
                                                 >
                                                     {isSelected && (
-                                                        <Ionicons name="checkmark" size={14} className="text-white" />
+                                                        <Ionicons name="checkmark" size={14} color="#ffffff" />
                                                     )}
                                                 </View>
                                             </View>

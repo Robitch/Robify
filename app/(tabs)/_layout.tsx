@@ -4,8 +4,6 @@ import React from 'react'
 import { StyleSheet } from 'react-native'
 import { BlurView } from 'expo-blur'
 import { Ionicons } from '@expo/vector-icons'
-import { FloatingPlayer } from '~/components/FloatingPlayer'
-import { MusicPlayer } from '~/components/MusicPlayer'
 import { Button } from '~/components/ui/button'
 import { Image } from 'expo-image'
 import { useColorScheme } from '~/lib/useColorScheme'
@@ -52,7 +50,7 @@ const TabsLayout = () => {
           options={{
             title: 'Musique',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="musical-notes-sharp" size={size} className={color} />
+              <Ionicons name="musical-notes-sharp" size={size} color={color} />
             ),
           }}
         />
@@ -60,14 +58,21 @@ const TabsLayout = () => {
           name="home"
           options={{
             title: 'Accueil',
-            tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} className={color} />,
+            tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="artists"
+          options={{
+            title: 'Artistes',
+            tabBarIcon: ({ color, size }) => <Ionicons name="people" size={size} color={color} />,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
             title: 'Profil',
-            tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} className={color} />,
+            tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -75,22 +80,11 @@ const TabsLayout = () => {
           options={{
             title: 'Upload',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="cloud-upload-outline" size={size} className={color} />
+              <Ionicons name="cloud-upload-outline" size={size} color={color} />
             ),
           }}
         />
       </Tabs>
-      {/* <FloatingPlayer className="absolute bottom-14 left-0 right-0" /> */}
-      <FloatingPlayer
-        style={{
-          position: 'absolute',
-          left: 8,
-          right: 8,
-          bottom: 78, // Adjusted for new tab bar height
-        }}
-      />
-      <MusicPlayer />
-
     </>
   )
 }

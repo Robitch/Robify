@@ -9,12 +9,12 @@ import { options } from '~/lib/useBackButton';
 export default function OnboardingLayout() {
     const router = useRouter();
 
-    cssInterop(Ionicons, {
-        className: {
-            target: 'color',
-            nativeStyleToProp: { color: true },
-        },
-    });
+    // cssInterop(Ionicons, {
+    //     className: {
+    //         target: 'color',
+    //         nativeStyleToProp: { color: true },
+    //     },
+    // });
 
     return (
         <Stack screenOptions={{

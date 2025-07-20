@@ -12,6 +12,8 @@ export default function Profile() {
     const { user, userProfile, signOut } = useAuth();
     const insets = useSafeAreaInsets();
 
+    console.log('User Profile:', userProfile);
+
     const handleSignOut = () => {
         Alert.alert(
             "Déconnexion",
@@ -32,7 +34,7 @@ export default function Profile() {
     }
 
     return (
-        <ScrollView 
+        <ScrollView
             className="flex-1 bg-background"
             style={{ paddingTop: insets.top + 16 }}
             contentContainerStyle={{
@@ -168,7 +170,7 @@ export default function Profile() {
                         </View>
                         <Ionicons name="chevron-forward" size={20} className="text-muted-foreground" />
                     </TouchableOpacity>
-                    
+
                     <TouchableOpacity className="flex-row items-center justify-between py-2">
                         <View className="flex-row items-center">
                             <Ionicons name="people" size={20} className="text-muted-foreground mr-3" />
@@ -176,7 +178,7 @@ export default function Profile() {
                         </View>
                         <Ionicons name="chevron-forward" size={20} className="text-muted-foreground" />
                     </TouchableOpacity>
-                    
+
                     <TouchableOpacity className="flex-row items-center justify-between py-2">
                         <View className="flex-row items-center">
                             <Ionicons name="help-circle" size={20} className="text-muted-foreground mr-3" />

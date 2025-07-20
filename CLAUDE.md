@@ -238,3 +238,14 @@ provider/             # React context providers
 - `service.js` - Background audio service for TrackPlayer
 - `app/(tabs)/upload.tsx` - Current upload implementation (needs enhancement)
 - `app/(tabs)/profile.tsx` - Basic profile page (needs complete redesign)
+
+## Development Memories
+- For Ionicons, added cssInterop to use Tailwind className:
+  ```javascript
+  cssInterop(Ionicons, {
+      className: {
+          target: 'color',
+          nativeStyleToProp: { color: true },
+      },
+  });
+  ```

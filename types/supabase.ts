@@ -11,88 +11,47 @@ export interface Database {
     Tables: {
       albums: {
         Row: {
-          artist_id: string
-          cover_url: string | null
+          album_type: string
+          artwork_url: string | null
           created_at: string
           description: string | null
           id: string
-          is_ep: boolean | null
-          is_published: boolean | null
+          is_public: boolean | null
           release_date: string | null
+          release_year: number | null
           title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          artist_id: string
-          cover_url?: string | null
+          album_type?: string
+          artwork_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
-          is_ep?: boolean | null
-          is_published?: boolean | null
+          is_public?: boolean | null
           release_date?: string | null
+          release_year?: number | null
           title: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          artist_id?: string
-          cover_url?: string | null
+          album_type?: string
+          artwork_url?: string | null
           created_at?: string
           description?: string | null
           id?: string
-          is_ep?: boolean | null
-          is_published?: boolean | null
+          is_public?: boolean | null
           release_date?: string | null
+          release_year?: number | null
           title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "albums_artist_id_fkey"
-            columns: ["artist_id"]
-            isOneToOne: false
-            referencedRelation: "artists"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      artists: {
-        Row: {
-          bio: string | null
-          created_at: string
-          genre: string[] | null
-          id: string
-          monthly_listeners: number | null
-          name: string
-          updated_at: string
-          user_id: string | null
-          verified: boolean | null
-        }
-        Insert: {
-          bio?: string | null
-          created_at?: string
-          genre?: string[] | null
-          id?: string
-          monthly_listeners?: number | null
-          name: string
-          updated_at?: string
-          user_id?: string | null
-          verified?: boolean | null
-        }
-        Update: {
-          bio?: string | null
-          created_at?: string
-          genre?: string[] | null
-          id?: string
-          monthly_listeners?: number | null
-          name?: string
-          updated_at?: string
-          user_id?: string | null
-          verified?: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "artists_user_id_fkey"
+            foreignKeyName: "albums_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user_profiles"
@@ -102,32 +61,32 @@ export interface Database {
       }
       collaborations: {
         Row: {
-          artist_id: string
+          user_id: string | null
           created_at: string
           id: string
           role: string
-          track_id: string
+          track_id: string | null
         }
         Insert: {
-          artist_id: string
+          user_id?: string | null
           created_at?: string
           id?: string
           role: string
-          track_id: string
+          track_id?: string | null
         }
         Update: {
-          artist_id?: string
+          user_id?: string | null
           created_at?: string
           id?: string
           role?: string
-          track_id?: string
+          track_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "collaborations_artist_id_fkey"
-            columns: ["artist_id"]
+            foreignKeyName: "collaborations_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "artists"
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -502,7 +461,6 @@ export interface Database {
       tracks: {
         Row: {
           album_id: string | null
-          artist_id: string
           artwork_url: string | null
           bpm: number | null
           created_at: string
@@ -516,11 +474,12 @@ export interface Database {
           lyrics: string | null
           mood: string[] | null
           title: string
+          track_number: number | null
           updated_at: string
+          user_id: string
         }
         Insert: {
           album_id?: string | null
-          artist_id: string
           artwork_url?: string | null
           bpm?: number | null
           created_at?: string
@@ -534,11 +493,12 @@ export interface Database {
           lyrics?: string | null
           mood?: string[] | null
           title: string
+          track_number?: number | null
           updated_at?: string
+          user_id: string
         }
         Update: {
           album_id?: string | null
-          artist_id?: string
           artwork_url?: string | null
           bpm?: number | null
           created_at?: string
@@ -552,7 +512,9 @@ export interface Database {
           lyrics?: string | null
           mood?: string[] | null
           title?: string
+          track_number?: number | null
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -563,10 +525,10 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "tracks_artist_id_fkey"
-            columns: ["artist_id"]
+            foreignKeyName: "tracks_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "artists"
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           }
         ]
@@ -582,7 +544,6 @@ export interface Database {
           instagram: string | null
           is_verified: boolean | null
           location: string | null
-          role: Database["public"]["Enums"]["user_role"]
           spotify: string | null
           twitter: string | null
           updated_at: string
@@ -599,7 +560,6 @@ export interface Database {
           instagram?: string | null
           is_verified?: boolean | null
           location?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
           spotify?: string | null
           twitter?: string | null
           updated_at?: string
@@ -616,7 +576,6 @@ export interface Database {
           instagram?: string | null
           is_verified?: boolean | null
           location?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
           spotify?: string | null
           twitter?: string | null
           updated_at?: string
@@ -641,7 +600,7 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      user_role: "artist" | "listener" | "admin"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never

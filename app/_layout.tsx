@@ -24,6 +24,7 @@ import { AuthProvider, useAuth } from "@/provider/AuthProvider";
 import { useSegments, useRouter } from "expo-router";
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { useSetupTrackPlayer } from "~/hooks/useSetupTrackPlayer";
+import { FloatingPlayer } from '~/components/FloatingPlayer';
 
 
 
@@ -164,6 +165,9 @@ export default function RootLayout() {
           <StatusBar style={isDarkColorScheme ? "light" : "dark"} backgroundColor="transparent" />
           <InitialLayout />
           <PortalHost />
+
+          {/* FloatingPlayer global - affiché sur toutes les pages */}
+          <FloatingPlayer />
           {/* </SafeAreaView> */}
         </GestureHandlerRootView>
       </ThemeProvider>
