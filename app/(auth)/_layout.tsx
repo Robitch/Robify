@@ -14,7 +14,7 @@ export default function AuthLayout() {
     }, [session]);
 
     return (
-        <Stack screenOptions={{}}>
+        <Stack screenOptions={{ title: '' }}>
             <Stack.Screen name="login" />
             <Stack.Screen name="register" />
         </Stack >

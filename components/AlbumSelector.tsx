@@ -58,7 +58,6 @@ export default function AlbumSelector({ onAlbumSelected, onCreateNew, onCancel }
                 ...album,
                 tracks_count: album.tracks?.length || 0,
                 user_profiles: {
-                    full_name: user.user_metadata?.full_name || 'Unknown',
                     username: user.user_metadata?.username || 'unknown',
                 },
             }));

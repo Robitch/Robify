@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Track } from "~/types";
 import { Text } from "~/components/ui/text";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { UI_CONSTANTS } from '@/constants/player';
 
 type SortField = 'title' | 'artist' | 'duration';
 type SortOrder = 'asc' | 'desc';
@@ -34,7 +35,6 @@ export default function Home() {
         .select(`
           *,
           user_profiles!tracks_main_artist_id_fkey (
-            full_name,
             username
           )
         `)
@@ -43,7 +43,6 @@ export default function Home() {
       if (fetchError) throw fetchError;
 
       setTracks(data || []);
-      console.log('Tracks:', data);
     } catch (err) {
       setError('Erreur lors du chargement des morceaux');
       console.error('Error fetching tracks:', err);
@@ -65,7 +64,7 @@ export default function Home() {
           paddingTop: insets.top + 16,
         }}
         contentContainerStyle={{
-          paddingBottom: 120, // Space for floating player + tabs
+          paddingBottom: UI_CONSTANTS.CONTENT_PADDING_BOTTOM,
         }}
         showsVerticalScrollIndicator={false}
         refreshControl={

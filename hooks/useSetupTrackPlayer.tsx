@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import TrackPlayer, { Capability, RatingType, RepeatMode } from 'react-native-track-player'
+import { AUDIO_CONSTANTS } from '@/constants/player'
 
 const setupPlayer = async () => {
 	await TrackPlayer.setupPlayer({
-		maxCacheSize: 1024 * 10,
+		maxCacheSize: AUDIO_CONSTANTS.CACHE_SIZE,
 	})
 
 	await TrackPlayer.updateOptions({
@@ -17,7 +18,7 @@ const setupPlayer = async () => {
 		],
 	})
 
-	await TrackPlayer.setVolume(0.3) // not too loud
+	await TrackPlayer.setVolume(AUDIO_CONSTANTS.DEFAULT_VOLUME)
 	await TrackPlayer.setRepeatMode(RepeatMode.Queue)
 }
 

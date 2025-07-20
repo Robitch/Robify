@@ -211,7 +211,7 @@ export default function AlbumPage() {
                         className="flex-row items-center"
                     >
                         <Text className="text-lg text-white/90 font-medium">
-                            {album.user_profiles?.full_name}
+                            @{album.user_profiles?.username}
                         </Text>
                         <Ionicons name="chevron-forward" size={16} className="text-white/70 ml-1" />
                     </TouchableOpacity>

@@ -184,7 +184,7 @@ export default function MusicItem({
                 id: versionToPlay ? `${track.id}_${versionToPlay.id}` : track.id,
                 url: trackToPlay.file_url,
                 title: trackToPlay.title,
-                artist: track.user_profiles?.full_name || 'Unknown Artist',
+                artist: track.user_profiles?.username || 'Unknown Artist',
                 artwork: track.artwork_url,
                 duration: trackToPlay.duration || 0,
             });
@@ -260,7 +260,7 @@ export default function MusicItem({
                             }`}
                             numberOfLines={1}
                         >
-                            {item.user_profiles?.full_name || 'Unknown Artist'}
+                            @{item.user_profiles?.username || 'Unknown Artist'}
                         </Text>
                     </View>
 

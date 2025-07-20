@@ -12,7 +12,6 @@ export default function Profile() {
     const { user, userProfile, signOut } = useAuth();
     const insets = useSafeAreaInsets();
 
-    console.log('User Profile:', userProfile);
 
     const handleSignOut = () => {
         Alert.alert(
@@ -56,11 +55,8 @@ export default function Profile() {
                     )}
                 </View>
 
-                {/* Name and username */}
+                {/* Username */}
                 <Text className="text-2xl font-bold text-center mb-2">
-                    {userProfile.full_name}
-                </Text>
-                <Text className="text-lg text-muted-foreground mb-2">
                     @{userProfile.username}
                 </Text>
 

@@ -27,7 +27,6 @@ interface VersionManagerModalProps {
 interface VersionWithCollaborators extends TrackVersion {
   collaborators?: {
     user_profiles: {
-      full_name: string;
       username: string;
       avatar_url?: string | null;
     };
@@ -105,7 +104,6 @@ export default function VersionManagerModal({
           *,
           collaborations!inner(
             user_profiles(
-              full_name,
               username,
               avatar_url
             )
@@ -163,7 +161,7 @@ export default function VersionManagerModal({
         id: `${track.id}_${version.id}`,
         url: version.file_url,
         title: `${track.title} (${version.version_name})`,
-        artist: track.user_profiles?.full_name || 'Artiste inconnu',
+        artist: track.user_profiles?.username || 'Artiste inconnu',
         artwork: track.artwork_url || undefined,
         duration: version.duration || 0,
       };
@@ -387,7 +385,7 @@ export default function VersionManagerModal({
                       }}
                     >
                       <Text className="text-xs text-foreground">
-                        {collab.user_profiles.full_name}
+                        @{collab.user_profiles.username}
                       </Text>
                     </View>
                   ))}

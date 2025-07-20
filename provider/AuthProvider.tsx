@@ -56,7 +56,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         id: userId,
         email: userData.email || '',
         username: userData.username || '',
-        full_name: userData.full_name || '',
         avatar_url: userData.avatar_url || null,
         bio: userData.bio || null,
         website: userData.website || null,
@@ -132,11 +131,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
       // Store user data temporarily for profile creation after auth is complete
       if (data.user) {
-        console.log('User created, profile will be created on first sign in');
         // Store userData in user_metadata so we can access it later
         await supabase.auth.updateUser({
           data: {
-            full_name: userData.full_name,
             username: userData.username
           }
         });
@@ -257,7 +254,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     // Listen for changes to authentication state
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session?.user?.id);
 
       setSession(session);
       setUser(session ? session.user : null);
@@ -268,23 +264,19 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
         // If profile doesn't exist, try to create one
         if (!profile && event === 'SIGNED_IN') {
-          console.log('No profile found for user, creating profile...');
           try {
             const userData = session.user.user_metadata || {};
             const newProfile = await createUserProfile(session.user.id, {
               email: session.user.email || '',
-              username: userData.username || session.user.email?.split('@')[0] || 'user',
-              full_name: userData.full_name || 'Utilisateur'
+              username: userData.username || session.user.email?.split('@')[0] || 'user'
             });
             profile = newProfile;
           } catch (createError: any) {
             console.error('Failed to create profile:', createError);
             // If profile creation fails due to duplicate, try to fetch existing one
             if (createError.code === '23505') {
-              console.log('Profile already exists, fetching it...');
               profile = await fetchUserProfile(session.user.id);
             } else {
-              console.log('Profile creation failed, signing out...');
               await supabase.auth.signOut();
               return;
             }

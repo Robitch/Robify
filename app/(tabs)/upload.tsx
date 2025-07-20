@@ -13,6 +13,7 @@ import { cn } from '~/lib/utils';
 import { Album, AlbumType, VersionType } from '~/types';
 import AlbumPicker from '@/components/AlbumPicker';
 import { UserSelector } from '@/components/UserSelector';
+import { AUDIO_CONSTANTS, UI_CONSTANTS } from '@/constants/player';
 
 interface UploadForm {
     title: string;
@@ -24,17 +25,12 @@ interface UploadForm {
 
 interface UserProfile {
     id: string;
-    full_name: string;
     username: string;
     avatar_url?: string | null;
 }
 
 
-const ACCEPTED_AUDIO_TYPES = [
-    'audio/mpeg',  // MP3
-    'audio/wav',   // WAV
-    'audio/flac',  // FLAC
-];
+const ACCEPTED_AUDIO_TYPES = AUDIO_CONSTANTS.SUPPORTED_FORMATS;
 
 export default function Upload() {
     const { userProfile, user } = useAuth();
@@ -59,7 +55,6 @@ export default function Upload() {
         if (user && userProfile && selectedUsers.length === 0) {
             const currentUser: UserProfile = {
                 id: user.id,
-                full_name: userProfile.full_name || '',
                 username: userProfile.username || '',
                 avatar_url: userProfile.avatar_url || null,
             };
@@ -81,7 +76,6 @@ export default function Upload() {
             setError(null);
         } catch (err) {
             setError('Erreur lors de la sélection du fichier');
-            console.error('Error picking file:', err);
         }
     };
 
@@ -152,7 +146,7 @@ export default function Upload() {
                 track_number: selectedAlbum && form.track_number ? form.track_number : null,
                 file_url: publicUrl,
                 genre: form.genre ? [form.genre] : null,
-                duration: 0, // TODO: Implement duration extraction
+                duration: 0, // Duration will be extracted during audio processing
                 is_published: true,
             };
 
@@ -174,7 +168,7 @@ export default function Upload() {
                 version_number: 'v1.0',
                 file_url: publicUrl,
                 duration: 0,
-                file_size: form.file?.size || 0,
+                file_size: file.size || 0,
                 quality: '320kbps',
                 is_primary: true,
                 is_public: true,
@@ -214,7 +208,6 @@ export default function Upload() {
             );
         } catch (err) {
             setError('Erreur lors de l\'upload. Veuillez réessayer.');
-            console.error('Upload error:', err);
         } finally {
             setIsUploading(false);
         }
@@ -237,7 +230,7 @@ export default function Upload() {
                 className="flex-1 bg-background"
                 style={{ paddingTop: insets.top + 8 }}
                 contentContainerStyle={{
-                    paddingBottom: 120, // Space for floating player + tabs
+                    paddingBottom: UI_CONSTANTS.CONTENT_PADDING_BOTTOM,
                 }}
                 showsVerticalScrollIndicator={false}
             >
@@ -307,7 +300,7 @@ export default function Upload() {
                                 </View>
                             ) : (
                                 <Text className="text-sm text-muted-foreground text-center">
-                                    MP3, WAV, FLAC sont supportés{'\n'}Taille max: 50MB
+                                    MP3, WAV, FLAC sont supportés{'\n'}Taille max: {AUDIO_CONSTANTS.MAX_FILE_SIZE_MB}MB
                                 </Text>
                             )}
                         </View>

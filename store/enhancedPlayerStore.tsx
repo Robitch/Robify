@@ -142,7 +142,7 @@ export const useEnhancedPlayerStore = create<EnhancedPlayerState>()((set, get) =
         id: `${track.id}_${version.id}`,
         url: version.file_url,
         title: track.title,
-        artist: track.user_profiles?.full_name || 'Unknown Artist',
+        artist: track.user_profiles?.username || 'Unknown Artist',
         artwork: track.artwork_url || undefined,
         duration: version.duration || track.duration || 0,
         // Métadonnées additionnelles

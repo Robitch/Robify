@@ -10,7 +10,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/provider/AuthProvider';
 
 interface RegisterFormData {
-  full_name: string;
   username: string;
   email: string;
   password: string;
@@ -25,7 +24,6 @@ export default function RegisterScreen() {
   const { control, handleSubmit, formState: { errors }, watch } = useForm<RegisterFormData>(
     {
       defaultValues: {
-        full_name: '',
         username: '',
         email: '',
         password: '',
@@ -45,7 +43,6 @@ export default function RegisterScreen() {
 
     try {
       await signUp(data.email, data.password, {
-        full_name: data.full_name,
         username: data.username,
       });
 
@@ -74,7 +71,7 @@ export default function RegisterScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* Logo */}
-      {/* <Image
+      <Image
         source={require("@/assets/images/logo.svg")}
         contentFit="contain"
         style={{
@@ -83,7 +80,7 @@ export default function RegisterScreen() {
           alignSelf: 'center',
           marginBottom: 30,
         }}
-      /> */}
+      />
 
       {/* Title */}
       <View className="gap-4 mb-8">
@@ -98,34 +95,6 @@ export default function RegisterScreen() {
 
       {/* Form */}
       <View className="gap-4">
-        <Controller
-          control={control}
-          rules={{
-            required: 'Le nom complet est requis',
-            minLength: {
-              value: 2,
-              message: 'Le nom doit contenir au moins 2 caractères',
-            },
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View>
-              <Input
-                className={errors.full_name ? 'border-red-500' : ''}
-                placeholder="Nom complet"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                autoComplete="name"
-              />
-              {errors.full_name && (
-                <Text className="text-red-500 mt-1">
-                  {errors.full_name.message}
-                </Text>
-              )}
-            </View>
-          )}
-          name="full_name"
-        />
 
         <Controller
           control={control}

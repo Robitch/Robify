@@ -191,31 +191,23 @@ export const useVersionsStore = create<VersionsState>()((set, get) => ({
 
   loadVersionStats: async (versionId: string) => {
     try {
-      // TODO: Implémenter la table version_stats
-      // const { data: stats, error } = await supabase
-      //   .from('version_stats')
-      //   .select('*')
-      //   .eq('version_id', versionId)
-      //   .single();
-
-      // if (error && error.code !== 'PGRST116') throw error;
-
-      // Données mockées pour l'instant
-      const mockStats: VersionStats = {
+      // Note: version_stats table implementation pending
+      // For now, return basic stats structure
+      const defaultStats: VersionStats = {
         version_id: versionId,
         track_id: '',
-        plays: Math.floor(Math.random() * 100),
-        likes: Math.floor(Math.random() * 50),
-        downloads: Math.floor(Math.random() * 20),
-        skip_rate: Math.random() * 0.3,
-        completion_rate: 0.7 + Math.random() * 0.3,
+        plays: 0,
+        likes: 0,
+        downloads: 0,
+        skip_rate: 0,
+        completion_rate: 0,
         created_at: new Date().toISOString()
       };
 
       set((state) => ({
         versionStats: {
           ...state.versionStats,
-          [versionId]: mockStats
+          [versionId]: defaultStats
         }
       }));
 

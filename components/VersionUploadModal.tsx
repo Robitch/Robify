@@ -33,7 +33,7 @@ interface VersionUploadModalProps {
 
 interface UserProfile {
   id: string;
-  full_name: string;
+  username: string;
   username: string;
   avatar_url?: string | null;
 }
@@ -113,7 +113,6 @@ export default function VersionUploadModal({
           user_id,
           user_profiles (
             id,
-            full_name,
             username,
             avatar_url
           )
@@ -124,7 +123,7 @@ export default function VersionUploadModal({
 
       const existingCollaborators = collaborations?.map(collab => ({
         id: collab.user_profiles?.id || '',
-        full_name: collab.user_profiles?.full_name || '',
+        username: collab.user_profiles?.username || '',
         username: collab.user_profiles?.username || '',
         avatar_url: collab.user_profiles?.avatar_url,
       })).filter(collab => collab.id !== '') || [];

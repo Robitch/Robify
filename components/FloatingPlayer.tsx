@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { PlayPauseButton, SkipToNextButton } from '@/components/PlayerControls'
+import { ANIMATION_CONSTANTS, UI_CONSTANTS } from '@/constants/player'
 import { useRouter, useSegments } from 'expo-router'
 import { TouchableOpacity, View, ViewProps } from 'react-native'
 import { useActiveTrack, useIsPlaying } from 'react-native-track-player'
@@ -34,13 +34,13 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 
 	// Déterminer si on est dans les tabs ou pas
 	const isInTabsLayout = segments[0] === '(tabs)'
-	const bottomOffset = isInTabsLayout ? 78 : insets.bottom + 16
+	const bottomOffset = isInTabsLayout 
+		? ANIMATION_CONSTANTS.FLOATING_PLAYER.BOTTOM_OFFSET_TABS 
+		: insets.bottom + ANIMATION_CONSTANTS.FLOATING_PLAYER.BOTTOM_OFFSET_DEFAULT
 
 	// Masquer le FloatingPlayer si on est sur la page PlayerScreen
 	const isOnPlayerScreen = (segments as string[]).includes('PlayerScreen')
 
-	console.log('Current segments:', segments)
-	console.log('Is on PlayerScreen:', isOnPlayerScreen)
 
 	// Animation values
 	const scale = useSharedValue(0)
@@ -75,12 +75,8 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 			resetAnimationValues()
 
 			// Puis lancer l'animation d'entrée
-			scale.value = withSpring(1, {
-				damping: 15,
-				stiffness: 150,
-				mass: 1
-			})
-			opacity.value = withTiming(1, { duration: 300 })
+			scale.value = withSpring(1, ANIMATION_CONSTANTS.SPRING_CONFIG)
+			opacity.value = withTiming(1, { duration: ANIMATION_CONSTANTS.TIMING_CONFIG.ENTRANCE_DURATION })
 			translateY.value = withSpring(0, {
 				damping: 12,
 				stiffness: 120
@@ -118,7 +114,6 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 			// Arrêter la musique et vider la queue
 			await TrackPlayer.pause()
 			await TrackPlayer.reset()
-			console.log('Player dismissed and queue cleared')
 		} catch (error) {
 			console.error('Error dismissing player:', error)
 		}
@@ -245,7 +240,7 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 							<MovingText
 								text={activeTrack.title || 'Titre inconnu'}
 								className="font-semibold text-foreground text-base"
-								animationThreshold={25}
+								animationThreshold={UI_CONSTANTS.MOVING_TEXT_THRESHOLD}
 							/>
 							<Text className="text-muted-foreground text-sm mt-1" numberOfLines={1}>
 								{activeTrack.artist || 'Artiste inconnu'}

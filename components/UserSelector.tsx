@@ -12,7 +12,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface User {
     id: string;
-    full_name: string;
     username: string;
     avatar_url?: string | null;
 }
@@ -49,8 +48,8 @@ export function UserSelector({
         try {
             const { data, error } = await supabase
                 .from('user_profiles')
-                .select('id, full_name, username, avatar_url')
-                .order('full_name');
+                .select('id, username, avatar_url')
+                .order('username');
 
             if (error) throw error;
             setUsers(data || []);
@@ -62,7 +61,7 @@ export function UserSelector({
     };
 
     const filteredUsers = users.filter(user =>
-        user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -134,7 +133,7 @@ export function UserSelector({
                                             />
                                         )}
                                         <Text className="text-white text-sm font-medium">
-                                            {user.full_name}
+                                            @{user.username}
                                         </Text>
                                         <Pressable onPress={() => removeUser(user.id)}>
                                             <Ionicons name="close" size={14} color="#ffffff" />
@@ -255,9 +254,6 @@ export function UserSelector({
                                                 {/* User Info */}
                                                 <View className="flex-1">
                                                     <Text className="font-semibold text-foreground">
-                                                        {user.full_name}
-                                                    </Text>
-                                                    <Text className="text-sm text-muted-foreground">
                                                         @{user.username}
                                                     </Text>
                                                 </View>

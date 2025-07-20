@@ -21,7 +21,6 @@ export interface Track {
     updated_at: string;
     rating?: number;
     user_profiles?: { // Changed from artists to user_profiles
-        full_name: string;
         username: string;
     };
     album?: Album; // Relation avec album
@@ -45,7 +44,6 @@ export interface Album {
     created_at: string;
     updated_at: string;
     user_profiles?: {
-        full_name: string;
         username: string;
     };
     tracks?: Track[];
@@ -140,7 +138,6 @@ export interface VersionCollaborator {
   role: string;                   // "Producer", "Vocalist", "Mixer", "Featured"
   created_at: string;
   user_profiles?: {
-    full_name: string;
     username: string;
     avatar_url?: string | null;
   };

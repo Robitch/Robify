@@ -564,7 +564,6 @@ export interface Database {
           bio: string | null
           created_at: string
           email: string
-          full_name: string
           id: string
           instagram: string | null
           is_verified: boolean | null
@@ -580,7 +579,6 @@ export interface Database {
           bio?: string | null
           created_at?: string
           email: string
-          full_name: string
           id: string
           instagram?: string | null
           is_verified?: boolean | null
@@ -596,7 +594,6 @@ export interface Database {
           bio?: string | null
           created_at?: string
           email?: string
-          full_name?: string
           id?: string
           instagram?: string | null
           is_verified?: boolean | null

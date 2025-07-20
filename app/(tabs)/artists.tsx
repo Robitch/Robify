@@ -10,7 +10,6 @@ import { useRouter } from 'expo-router';
 
 interface Artist {
     id: string;
-    full_name: string;
     username: string;
     avatar_url?: string;
     bio?: string;
@@ -39,7 +38,7 @@ export default function Artists() {
             // D'abord, récupérer tous les utilisateurs
             const { data: usersData, error: usersError } = await supabase
                 .from('user_profiles')
-                .select('id, full_name, username, avatar_url, bio, created_at');
+                .select('id, username, avatar_url, bio, created_at');
 
             if (usersError) throw usersError;
 
@@ -62,7 +61,6 @@ export default function Artists() {
             const filteredArtists = artistsWithCount.filter(artist => artist.tracks_count > 0);
 
             setArtists(filteredArtists as Artist[]);
-            console.log('Artists:', filteredArtists);
         } catch (err) {
             setError('Erreur lors du chargement des artistes');
             console.error('Error fetching artists:', err);
@@ -169,9 +167,6 @@ export default function Artists() {
                                     {/* Artist Info */}
                                     <View className="flex-1">
                                         <Text className="text-lg font-bold text-foreground mb-1">
-                                            {artist.full_name}
-                                        </Text>
-                                        <Text className="text-sm text-muted-foreground mb-2">
                                             @{artist.username}
                                         </Text>
                                         <Text className="text-xs text-primary">

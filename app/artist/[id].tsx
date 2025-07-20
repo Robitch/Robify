@@ -15,7 +15,6 @@ const { width, height } = Dimensions.get('window');
 
 interface Artist {
     id: string;
-    full_name: string;
     username: string;
     avatar_url?: string;
     bio?: string;
@@ -76,7 +75,6 @@ export default function ArtistProfile() {
             const tracksWithProfiles = tracksData?.map(track => ({
                 ...track,
                 user_profiles: {
-                    full_name: artistData.full_name,
                     username: artistData.username
                 }
             })) || [];
@@ -208,7 +206,7 @@ export default function ArtistProfile() {
                 {/* Artist info overlay */}
                 <View className="absolute bottom-0 left-0 right-0 p-6">
                     <Text className="text-4xl font-bold text-white mb-2">
-                        {artist.full_name}
+                        @{artist.username}
                     </Text>
                     <Text className="text-lg text-white/80">
                         {albums.length} Album{albums.length > 1 ? 's' : ''} • {tracks.length} Track{tracks.length > 1 ? 's' : ''}
