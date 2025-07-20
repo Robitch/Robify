@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "expo start -c",
+    "dev:tunnel": "expo start -c --tunnel",
     "dev:web": "expo start -c --web",
     "dev:android": "expo start -c --android",
     "android": "expo start -c --android",

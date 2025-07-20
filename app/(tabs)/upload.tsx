@@ -65,7 +65,7 @@ export default function Upload() {
     const pickFile = async () => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
-                type: ACCEPTED_AUDIO_TYPES,
+                type: Array.from(ACCEPTED_AUDIO_TYPES),
             });
 
             if (result.canceled) {
@@ -73,6 +73,8 @@ export default function Upload() {
             }
 
             setSelectedFile(result);
+            // set le nom du fichier dans le formulaire
+            setForm(prev => ({ ...prev, title: result.assets[0].name.split('.').slice(0, -1).join('.') }));
             setError(null);
         } catch (err) {
             setError('Erreur lors de la sélection du fichier');
@@ -216,7 +218,7 @@ export default function Upload() {
     // Handler pour la sélection d'album
     const handleAlbumSelected = (album: Album) => {
         setSelectedAlbum(album);
-        
+
         // Calculer automatiquement le prochain numéro de track
         const nextTrackNumber = (album.tracks_count || 0) + 1;
         setForm(prev => ({ ...prev, track_number: nextTrackNumber }));
@@ -382,14 +384,14 @@ export default function Upload() {
                                     placeholder="Ex: Version initiale"
                                     leftIcon="create-outline"
                                 />
-                                
+
                                 {/* Version Type Selector */}
                                 <View>
                                     <Text className="text-sm font-medium text-foreground mb-2">
                                         Type de version
                                     </Text>
-                                    <ScrollView 
-                                        horizontal 
+                                    <ScrollView
+                                        horizontal
                                         showsHorizontalScrollIndicator={false}
                                         contentContainerStyle={{ paddingHorizontal: 4 }}
                                     >
@@ -409,10 +411,10 @@ export default function Upload() {
                                                         paddingVertical: 12,
                                                         borderRadius: 12,
                                                         borderWidth: 1,
-                                                        borderColor: form.initialVersionType === versionType.type 
-                                                            ? '#10b981' 
+                                                        borderColor: form.initialVersionType === versionType.type
+                                                            ? '#10b981'
                                                             : (isDarkColorScheme ? '#374151' : '#d1d5db'),
-                                                        backgroundColor: form.initialVersionType === versionType.type 
+                                                        backgroundColor: form.initialVersionType === versionType.type
                                                             ? (isDarkColorScheme ? '#064e3b20' : '#d1fae520')
                                                             : 'transparent',
                                                         minWidth: 80,
@@ -422,16 +424,16 @@ export default function Upload() {
                                                         <Ionicons
                                                             name={versionType.icon as any}
                                                             size={20}
-                                                            color={form.initialVersionType === versionType.type 
-                                                                ? '#10b981' 
+                                                            color={form.initialVersionType === versionType.type
+                                                                ? '#10b981'
                                                                 : (isDarkColorScheme ? '#9ca3af' : '#6b7280')}
                                                             style={{ marginBottom: 4 }}
                                                         />
-                                                        <Text 
+                                                        <Text
                                                             className={cn(
                                                                 "text-xs font-medium text-center",
-                                                                form.initialVersionType === versionType.type 
-                                                                    ? "text-primary" 
+                                                                form.initialVersionType === versionType.type
+                                                                    ? "text-primary"
                                                                     : "text-muted-foreground"
                                                             )}
                                                         >

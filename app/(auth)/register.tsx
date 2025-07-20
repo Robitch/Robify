@@ -104,10 +104,6 @@ export default function RegisterScreen() {
               value: 3,
               message: 'Le nom d\'utilisateur doit contenir au moins 3 caractères',
             },
-            pattern: {
-              value: /^[a-zA-Z0-9_]+$/,
-              message: 'Seuls les lettres, chiffres et _ sont autorisés',
-            },
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <View>

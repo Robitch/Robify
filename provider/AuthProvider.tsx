@@ -122,6 +122,11 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            username: userData.username,
+          },
+        },
       });
 
       if (error) {

@@ -130,7 +130,7 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
         duration: null, // TODO: Extraire la durée
         file_size: data.file.size,
         quality: '320kbps', // Valeur par défaut
-        is_primary: versions.length === 0, // Première version = primaire
+        is_primary: false, // Les nouvelles versions ne sont jamais primaires par défaut
         is_public: data.is_public,
         version_notes: data.version_notes || 'Nouvelle version',
       };

@@ -27,3 +27,14 @@ export async function getImageColors(url: string) {
   // return an array of all the colors of the result
   // return Object.values(result);
 }
+
+// Function to format date for display
+export function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
