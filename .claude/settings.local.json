@@ -14,7 +14,8 @@
       "Bash(touch:*)",
       "Bash(rg:*)",
       "mcp__supabase__list_tables",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   },

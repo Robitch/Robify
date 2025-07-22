@@ -24,7 +24,7 @@ import { AuthProvider, useAuth } from "@/provider/AuthProvider";
 import { useSegments, useRouter } from "expo-router";
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { useSetupTrackPlayer } from "~/hooks/useSetupTrackPlayer";
-import { FloatingPlayer } from '~/components/FloatingPlayer';
+import { FloatingPlayer } from "~/components/FloatingPlayer";
 
 
 
@@ -77,7 +77,7 @@ const InitialLayout = () => {
       {/* <Stack.Screen name="(auth)/index" options={{ animation: 'slide_from_right' }} /> */}
       <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
 
-      <Stack.Screen
+      {/* <Stack.Screen
         name="PlayerScreen"
         options={{
           presentation: 'card',
@@ -87,7 +87,19 @@ const InitialLayout = () => {
           headerShown: false,
           animation: "slide_from_bottom",
         }}
+      /> */}
+
+      <Stack.Screen
+        name="PlayerScreen"
+        options={{
+          headerShown: false,
+          presentation: 'modal',
+          gestureEnabled: true,
+          gestureDirection: 'vertical',
+          animation: 'slide_from_bottom',
+        }}
       />
+
       <Stack.Screen
         name="ProfileSetup"
         options={{
@@ -153,8 +165,6 @@ export default function RootLayout() {
           <InitialLayout />
           <PortalHost />
 
-          {/* FloatingPlayer global - affiché sur toutes les pages */}
-          <FloatingPlayer />
           {/* </SafeAreaView> */}
         </GestureHandlerRootView>
       </ThemeProvider>

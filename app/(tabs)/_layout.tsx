@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Button } from '~/components/ui/button'
 import { Image } from 'expo-image'
 import { useColorScheme } from '~/lib/useColorScheme'
+import { FloatingPlayer } from '~/components/FloatingPlayer'
 
 // Simple stack layout within the authenticated area
 const TabsLayout = () => {
@@ -15,8 +16,9 @@ const TabsLayout = () => {
 
   return (
     <>
-
       <Tabs
+
+
         screenOptions={{
           // Disable headers by default to save space
           headerShown: false,
@@ -30,6 +32,7 @@ const TabsLayout = () => {
             marginBottom: 4,
           },
           tabBarStyle: {
+            zIndex: 1000,
             backgroundColor: isDarkColorScheme ? '#000000' : '#ffffff',
             borderTopWidth: 1,
             borderTopColor: isDarkColorScheme ? '#374151' : '#f3f4f6',
@@ -76,6 +79,9 @@ const TabsLayout = () => {
           }}
         />
       </Tabs>
+
+      {/* Mini Player fixe au-dessus de la bottom bar */}
+      <FloatingPlayer />
     </>
   )
 }

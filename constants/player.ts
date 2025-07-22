@@ -1,24 +1,37 @@
-// Player and Animation Constants
+// Enhanced Player and Animation Constants
 export const ANIMATION_CONSTANTS = {
   FLOATING_PLAYER: {
     BOTTOM_OFFSET_TABS: 78,
     BOTTOM_OFFSET_DEFAULT: 16,
-    DISMISS_THRESHOLD_Y: 80,
-    DISMISS_VELOCITY_Y: 500,
+    DISMISS_THRESHOLD_Y: 70,
+    DISMISS_VELOCITY_Y: 400,
     OPEN_THRESHOLD_Y: -50,
     OPEN_VELOCITY_Y: -500,
-    SHADOW_OPACITY_MIN: 0.1,
-    SHADOW_OPACITY_MAX: 0.3,
+    SHADOW_OPACITY_MIN: 0.2,
+    SHADOW_OPACITY_MAX: 0.4,
     CACHE_SIZE_MB: 10,
   },
   SPRING_CONFIG: {
-    DAMPING: 15,
-    STIFFNESS: 150,
-    MASS: 1,
+    damping: 20,
+    stiffness: 120,
+    mass: 0.8,
   },
-  TIMING_CONFIG: {
-    ENTRANCE_DURATION: 300,
-    EXIT_DURATION: 200,
+  ELASTIC_CONFIG: {
+    damping: 15,
+    stiffness: 150,
+    mass: 0.6,
+  },
+  MORPH_CONFIG: {
+    duration: 500,
+    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  },
+  TRANSITION: {
+    MORPH_DURATION: 500,
+    CONTENT_DELAY: 200,
+    SPRING_DAMPING: 20,
+    SPRING_STIFFNESS: 100,
+    ENTRANCE_DURATION: 400,
+    EXIT_DURATION: 300,
   }
 } as const;
 
@@ -34,7 +47,8 @@ export const AUDIO_CONSTANTS = {
 } as const;
 
 export const UI_CONSTANTS = {
-  CONTENT_PADDING_BOTTOM: 120, // Space for floating player + tabs
+  CONTENT_PADDING_BOTTOM: 130, // Space for mini player + tabs (60 + 70)
+  MINI_PLAYER_HEIGHT: 60, // Hauteur du mini player
   MOVING_TEXT_THRESHOLD: 25,
   NOTIFICATION_ICON: 'notification_icon',
 } as const;
