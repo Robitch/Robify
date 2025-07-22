@@ -7,6 +7,7 @@ import { Track } from "~/types";
 import { Text } from "~/components/ui/text";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { UI_CONSTANTS } from '@/constants/player';
+import { useFavoritesStore } from '@/store/favoritesStore';
 
 type SortField = 'title' | 'artist' | 'duration';
 type SortOrder = 'asc' | 'desc';
@@ -22,9 +23,13 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialiser le store des favoris
+  const { initializeFavorites } = useFavoritesStore();
+
   useEffect(() => {
     // if (!user) return;
-    fetchTracks()
+    fetchTracks();
+    initializeFavorites(); // Initialiser les favoris
   }, [sortField, sortOrder]);
 
   const fetchTracks = async (isRefresh = false) => {
@@ -34,9 +39,7 @@ export default function Home() {
         .from('tracks')
         .select(`
           *,
-          user_profiles!tracks_main_artist_id_fkey (
-            username
-          )
+          user_profiles(username)
         `)
         .order(sortField, { ascending: sortOrder === 'asc' });
 

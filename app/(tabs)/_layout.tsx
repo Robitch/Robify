@@ -56,6 +56,13 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
+          name="library"
+          options={{
+            title: 'Ma Bibliothèque',
+            tabBarIcon: ({ color, size }) => <Ionicons name="library" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
           name="artists"
           options={{
             title: 'Artistes',

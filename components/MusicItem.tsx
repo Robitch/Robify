@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Dimensions, Modal, Alert } from 'react-native';
+import { View, TouchableOpacity, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@/components/ui/text';
 import { Track, TrackVersion, VersionType } from '~/types';
@@ -8,6 +8,9 @@ import { Image } from 'expo-image';
 import { useColorScheme } from '~/lib/useColorScheme';
 import { useTrackVersions } from '@/store/versionsStore';
 import VersionManagerModal from './VersionManagerModal';
+import FavoriteButton from './library/FavoriteButton';
+
+// import DownloadButton from './library/DownloadButton';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/provider/AuthProvider';
 import Animated, {
@@ -17,6 +20,7 @@ import Animated, {
     withTiming,
     interpolate,
 } from 'react-native-reanimated';
+import MoreOptionsDropdown from './MoreOptionsDropdown';
 
 const { width } = Dimensions.get('window');
 
@@ -42,6 +46,8 @@ const VERSION_TYPE_COLORS = {
 };
 
 
+
+
 export default function MusicItem({
     item,
     onRemoveMusic,
@@ -55,7 +61,6 @@ export default function MusicItem({
     const { playing } = useIsPlaying();
 
     // States for version management
-    const [showOptionsMenu, setShowOptionsMenu] = useState(false);
     const [showVersionManagerModal, setShowVersionManagerModal] = useState(false);
     const [activeVersion, setActiveVersion] = useState<TrackVersion | null>(null);
     const [versionsCount, setVersionsCount] = useState(0);
@@ -167,7 +172,7 @@ export default function MusicItem({
                 url: trackToPlay.file_url,
                 title: trackToPlay.title,
                 artist: track.user_profiles?.username || 'Unknown Artist',
-                artwork: track.artwork_url,
+                artwork: track.artwork_url ?? undefined,
                 duration: trackToPlay.duration || 0,
             });
             await TrackPlayer.play();
@@ -263,11 +268,27 @@ export default function MusicItem({
                     )}
 
 
+                    {/* Download Button */}
+                    {/* <DownloadButton 
+                        track={item}
+                        size={compact ? 20 : 24}
+                        variant={compact ? "mini" : "default"}
+                        showProgress={!compact}
+                    /> */}
+
+                    {/* Favorite Button */}
+                    <FavoriteButton
+                        track={item}
+                        size={compact ? 20 : 24}
+                        variant={compact ? "mini" : "default"}
+                        showReactionType={true}
+                    />
+
                     {/* Play/Pause Button */}
-                    <Animated.View style={playButtonAnimatedStyle}>
+                    {/* <Animated.View style={playButtonAnimatedStyle}>
                         <TouchableOpacity
                             onPress={() => playTrack(item)}
-                            className={`w-12 h-12 rounded-full items-center justify-center ${isCurrentTrack
+                            className={`w-12 h-12 rounded-full items-center justify-center ml-2 ${isCurrentTrack
                                 ? 'bg-emerald-500'
                                 : (isDarkColorScheme ? 'bg-gray-700' : 'bg-gray-100')
                                 }`}
@@ -280,134 +301,21 @@ export default function MusicItem({
                                 style={{ marginLeft: isPlaying ? 0 : 2 }}
                             />
                         </TouchableOpacity>
-                    </Animated.View>
+                    </Animated.View> */}
 
-                    {/* More Options */}
-                    <TouchableOpacity
-                        onPress={() => setShowOptionsMenu(true)}
-                        className="w-10 h-10 items-center justify-center ml-2"
-                        activeOpacity={0.7}
-                    >
-                        <Ionicons
-                            name="ellipsis-horizontal"
-                            size={18}
-                            className="text-muted-foreground"
-                        />
-                    </TouchableOpacity>
+                    {/* More Options Dropdown */}
+                    <MoreOptionsDropdown
+                        track={item}
+                        onRemoveMusic={onRemoveMusic}
+                        showVersionManager={() => setShowVersionManagerModal(true)}
+                        canAddVersion={canAddVersion}
+                        onVersionAdded={onVersionAdded}
+                        isCurrentTrack={isCurrentTrack}
+                        versionsCount={versionsCount}
+                    />
                 </View>
 
             </TouchableOpacity>
-
-            {/* Options Menu Modal */}
-            <Modal
-                visible={showOptionsMenu}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setShowOptionsMenu(false)}
-            >
-                <TouchableOpacity
-                    style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
-                    activeOpacity={1}
-                    onPress={() => setShowOptionsMenu(false)}
-                >
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
-                        <TouchableOpacity activeOpacity={1}>
-                            <View
-                                style={{
-                                    backgroundColor: isDarkColorScheme ? '#1f2937' : '#ffffff',
-                                    borderRadius: 16,
-                                    padding: 4,
-                                    minWidth: 200,
-                                    shadowColor: '#000',
-                                    shadowOffset: { width: 0, height: 4 },
-                                    shadowOpacity: 0.3,
-                                    shadowRadius: 8,
-                                    elevation: 8,
-                                }}
-                            >
-
-                                {/* View Versions Option */}
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        setShowOptionsMenu(false);
-                                        setShowVersionManagerModal(true);
-                                    }}
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        padding: 16,
-                                        borderRadius: 12,
-                                    }}
-                                    activeOpacity={0.7}
-                                >
-                                    <View
-                                        style={{
-                                            width: 32,
-                                            height: 32,
-                                            borderRadius: 16,
-                                            backgroundColor: isDarkColorScheme ? '#374151' : '#f3f4f6',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            marginRight: 12,
-                                        }}
-                                    >
-                                        <Ionicons
-                                            name="list"
-                                            size={16}
-                                            color={isDarkColorScheme ? '#9ca3af' : '#6b7280'}
-                                        />
-                                    </View>
-                                    <View className="flex-1">
-                                        <Text className="text-foreground font-medium">
-                                            Gérer les versions
-                                        </Text>
-                                        <Text className="text-muted-foreground text-xs">
-                                            {versionsCount} version{versionsCount > 1 ? 's' : ''} disponible{versionsCount > 1 ? 's' : ''}
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
-
-                                {/* Remove Option */}
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        setShowOptionsMenu(false);
-                                        onRemoveMusic();
-                                    }}
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        padding: 16,
-                                        borderRadius: 12,
-                                    }}
-                                    activeOpacity={0.7}
-                                >
-                                    <View
-                                        style={{
-                                            width: 32,
-                                            height: 32,
-                                            borderRadius: 16,
-                                            backgroundColor: '#ef444420',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            marginRight: 12,
-                                        }}
-                                    >
-                                        <Ionicons name="trash-outline" size={16} color="#ef4444" />
-                                    </View>
-                                    <View className="flex-1">
-                                        <Text style={{ color: '#ef4444' }} className="font-medium">
-                                            Supprimer
-                                        </Text>
-                                        <Text className="text-muted-foreground text-xs">
-                                            Retirer de la liste
-                                        </Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                </TouchableOpacity>
-            </Modal>
 
             {/* Version Manager Modal */}
             <VersionManagerModal

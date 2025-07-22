@@ -16,6 +16,7 @@ const setupPlayer = async () => {
 			Capability.SkipToPrevious,
 			Capability.Stop,
 		],
+		
 	})
 
 	await TrackPlayer.setVolume(AUDIO_CONSTANTS.DEFAULT_VOLUME)

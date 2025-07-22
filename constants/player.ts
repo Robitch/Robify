@@ -37,7 +37,7 @@ export const ANIMATION_CONSTANTS = {
 
 export const AUDIO_CONSTANTS = {
   CACHE_SIZE: 1024 * 10, // 10MB
-  DEFAULT_VOLUME: 0.3,
+  DEFAULT_VOLUME: 1.0,
   SUPPORTED_FORMATS: [
     'audio/mpeg',  // MP3
     'audio/wav',   // WAV
