@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Audio } from 'expo-av';
 import { supabase } from '@/lib/supabase';
 import { 
   TrackVersion, 
@@ -9,6 +10,24 @@ import {
   VersionCollaborator
 } from '@/types';
 import { useAuth } from '@/provider/AuthProvider';
+
+// Fonction pour extraire la durée d'un fichier audio
+const getAudioDuration = async (uri: string): Promise<number> => {
+  try {
+    const sound = new Audio.Sound();
+    await sound.loadAsync({ uri });
+    const status = await sound.getStatusAsync();
+    await sound.unloadAsync();
+    
+    if (status.isLoaded && status.durationMillis) {
+      return Math.round(status.durationMillis / 1000); // Convertir en secondes
+    }
+    return 0;
+  } catch (error) {
+    console.warn('Erreur lors de l\'extraction de la durée:', error);
+    return 0;
+  }
+};
 
 export interface UseVersionsResult {
   versions: TrackVersion[];
@@ -111,7 +130,11 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
         .from('files')
         .getPublicUrl(filePath);
 
-      // 3. Générer le numéro de version automatiquement
+      // 3. Extraire la durée du fichier audio
+      const audioDuration = await getAudioDuration(data.file.uri);
+      console.log('Durée audio extraite pour version:', audioDuration, 'secondes');
+
+      // 4. Générer le numéro de version automatiquement
       const existingVersions = await supabase
         .from('track_versions')
         .select('version_name')
@@ -120,14 +143,14 @@ export const useVersions = (trackId?: string): UseVersionsResult => {
 
       const versionCount = existingVersions.data?.length || 0;
 
-      // 4. Créer l'enregistrement de version (nouveau schéma)
+      // 5. Créer l'enregistrement de version (nouveau schéma)
       const versionPayload = {
         track_id: targetTrackId,
         version_name: data.version_name,
         version_type: data.version_type,
         version_number: `v${versionCount + 1}.0`,
         file_url: publicUrl,
-        duration: null, // TODO: Extraire la durée
+        duration: audioDuration,
         file_size: data.file.size,
         quality: '320kbps', // Valeur par défaut
         is_primary: false, // Les nouvelles versions ne sont jamais primaires par défaut

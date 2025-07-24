@@ -115,7 +115,7 @@ export const LibraryStats: React.FC<LibraryStatsProps> = ({ stats, isLoading }) 
     {
       title: 'Temps d\'écoute',
       value: formatDuration(stats.totalListeningTime),
-      subtitle: 'Total écouté',
+      subtitle: `${stats.totalListens || 0} écoutes`,
       icon: 'time' as const,
       color: '#8b5cf6',
     },

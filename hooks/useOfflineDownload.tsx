@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-// import * as Network from 'expo-network';
+import * as Network from 'expo-network';
 import { useOfflineStore } from '~/store/offlineStore';
 import { Track } from '@/types';
 import { DownloadProgress } from '~/types/library';
@@ -75,7 +75,7 @@ export const useOfflineDownload = (): UseOfflineDownloadReturn => {
       try {
         const networkState = await Network.getNetworkStateAsync();
         setIsOnline(networkState.isConnected || false);
-        setNetworkType(networkState.type);
+        setNetworkType(networkState.type || Network.NetworkStateType.UNKNOWN);
       } catch (error) {
         console.error('Erreur vérification réseau:', error);
         setIsOnline(false);

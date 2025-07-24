@@ -10,6 +10,7 @@ import { useColorScheme } from '~/lib/useColorScheme'
 import { Ionicons } from '@expo/vector-icons'
 import TrackPlayer from 'react-native-track-player'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { usePlayerWithTracking } from '@/hooks/usePlayerWithTracking'
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
@@ -32,8 +33,15 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
 	const segments = useSegments()
 	const insets = useSafeAreaInsets()
 	const { isDarkColorScheme } = useColorScheme()
-	const activeTrack = useActiveTrack()
-	const { playing } = useIsPlaying()
+	
+	// Utiliser le hook de tracking intégré
+	const {
+		activeTrack,
+		playing,
+		progress,
+		isTracking,
+		currentTrack,
+	} = usePlayerWithTracking()
 
 
 
@@ -452,7 +460,7 @@ const AlbumArtwork = ({ artwork, isDarkColorScheme }: {
 
 // Composant séparé pour les contrôles
 const PlayerControlsFloating = ({ isDarkColorScheme }: { isDarkColorScheme: boolean }) => {
-	const { playing } = useIsPlaying()
+	const { playing } = usePlayerWithTracking()
 	const pressScalePlay = useSharedValue(1)
 
 	const handlePlayPause = async () => {

@@ -185,9 +185,7 @@ export default function FavoritesScreen() {
               <View key={track.id} className="mb-3">
                 <MusicItem
                   item={track}
-                  onRemoveMusic={() => handleToggleFavorite(track.id, track.reaction_type)}
-                  showArtwork={true}
-                  compact={false}
+                  onRemoveMusic={() => void 0}
                 />
               </View>
             ))}

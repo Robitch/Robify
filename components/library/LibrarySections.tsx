@@ -58,11 +58,11 @@ const SectionItem: React.FC<SectionItemProps> = ({
               </Text>
               <View className="flex-row items-center">
                 {count > 0 && (
-                  <View 
+                  <View
                     className="px-2 py-1 rounded-full mr-2"
                     style={{ backgroundColor: `${color}20` }}
                   >
-                    <Text 
+                    <Text
                       className="text-xs font-medium"
                       style={{ color }}
                     >
@@ -116,7 +116,7 @@ export const LibrarySections: React.FC<LibrarySectionsProps> = ({ isLoading }) =
       count: offlineTracks.length,
       icon: 'cloud-download' as const,
       color: '#06b6d4',
-      route: '/library/offline',
+      route: '/library/downloads',
     },
     {
       title: 'Historique',

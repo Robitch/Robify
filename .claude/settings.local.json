@@ -15,7 +15,8 @@
       "Bash(rg:*)",
       "mcp__supabase__list_tables",
       "Bash(grep:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "mcp__supabase__get_project"
     ],
     "deny": []
   },

@@ -1,30 +1,14 @@
 import { create } from 'zustand';
 import { Track } from '@/types';
 import { supabase } from '@/lib/supabase';
-
-interface ListeningEntry {
-  id: string;
-  track_id: string;
-  user_id: string;
-  listened_at: string;
-  duration_listened: number; // en secondes
-  completed: boolean;
-  track?: Track;
-}
-
-interface ListeningStats {
-  totalListeningTime: number; // en secondes
-  totalTracks: number;
-  averageListeningTime: number;
-  completionRate: number; // pourcentage
-  mostPlayedTrack: Track | null;
-  favoriteArtist: string | null;
-  dailyAverage: number; // minutes par jour
-  weeklyStats: { date: string; minutes: number }[];
-  monthlyStats: { month: string; minutes: number }[];
-  topGenres: { genre: string; minutes: number }[];
-  recentlyPlayed: Track[];
-}
+import { 
+  ListeningEntry, 
+  ListeningStats, 
+  WeeklyStats, 
+  MonthlyStats, 
+  GenreStats,
+  DailyStats 
+} from '~/types/library';
 
 interface HistoryStore {
   // État
@@ -33,6 +17,13 @@ interface HistoryStore {
   listeningHistory: ListeningEntry[];
   stats: ListeningStats;
   recentTracks: Track[];
+  
+  // Session en cours pour le tracking
+  currentSession: {
+    trackId: string | null;
+    startTime: Date | null;
+    lastProgressUpdate: number;
+  };
   
   // Filtres et pagination
   dateRange: 'day' | 'week' | 'month' | 'year' | 'all';
@@ -43,6 +34,11 @@ interface HistoryStore {
   // Actions principales
   initializeHistory: () => Promise<void>;
   refreshHistory: () => Promise<void>;
+  
+  // Actions de tracking
+  startListeningSession: (track: Track) => void;
+  updateListeningProgress: (trackId: string, currentTime: number, duration: number) => void;
+  completeListeningSession: (trackId: string, totalDuration: number, completed: boolean) => Promise<void>;
   
   // Actions d'enregistrement
   recordListening: (trackId: string, durationListened: number, completed: boolean) => Promise<void>;
@@ -91,6 +87,11 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
   listeningHistory: [],
   stats: initialStats,
   recentTracks: [],
+  currentSession: {
+    trackId: null,
+    startTime: null,
+    lastProgressUpdate: 0,
+  },
   dateRange: 'all',
   currentPage: 1,
   itemsPerPage: 50,
@@ -119,6 +120,70 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
       get().getHistoryByDateRange(dateRange),
       get().calculateStats(),
     ]);
+  },
+
+  // Actions de tracking
+  startListeningSession: (track: Track) => {
+    const now = new Date();
+    set({
+      currentSession: {
+        trackId: track.id,
+        startTime: now,
+        lastProgressUpdate: 0,
+      }
+    });
+
+    // Ajouter immédiatement aux récemment joués (même si pas terminé)
+    const { recentTracks } = get();
+    const updatedRecent = [
+      track,
+      ...recentTracks.filter(t => t.id !== track.id)
+    ].slice(0, 50); // Garder seulement les 50 plus récents
+
+    set({ recentTracks: updatedRecent });
+  },
+
+  updateListeningProgress: (trackId: string, currentTime: number, duration: number) => {
+    const { currentSession } = get();
+    
+    if (currentSession.trackId === trackId) {
+      set({
+        currentSession: {
+          ...currentSession,
+          lastProgressUpdate: currentTime,
+        }
+      });
+
+      // Auto-compléter si on atteint 80% de la durée
+      if (currentTime >= duration * 0.8) {
+        get().completeListeningSession(trackId, duration, true);
+      }
+    }
+  },
+
+  completeListeningSession: async (trackId: string, totalDuration: number, completed: boolean) => {
+    const { currentSession } = get();
+    
+    if (currentSession.trackId === trackId && currentSession.startTime) {
+      const listenedDuration = Math.min(
+        currentSession.lastProgressUpdate,
+        totalDuration
+      );
+
+      // Ne compter que si écouté au moins 30 secondes
+      if (listenedDuration >= 30) {
+        await get().recordListening(trackId, listenedDuration, completed);
+      }
+
+      // Réinitialiser la session
+      set({
+        currentSession: {
+          trackId: null,
+          startTime: null,
+          lastProgressUpdate: 0,
+        }
+      });
+    }
   },
 
   // Actions d'enregistrement
@@ -203,18 +268,7 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
 
       let query = supabase
         .from('listening_history')
-        .select(`
-          *,
-          tracks (
-            *,
-            user_profiles!tracks_user_id_fkey (
-              username
-            ),
-            albums (
-              title
-            )
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('listened_at', { ascending: false })
         .limit(get().itemsPerPage);
@@ -228,10 +282,10 @@ export const useHistoryStore = create<HistoryStore>((set, get) => ({
       if (error) throw error;
 
       const listeningHistory = data as ListeningEntry[];
-      const recentTracks = listeningHistory
-        .map(entry => entry.tracks)
-        .filter(Boolean)
-        .slice(0, 20) as Track[];
+      
+      // Pour l'instant, on n'a pas de données de tracks liées
+      // On créera des tracks fictives basées sur les track_id
+      const recentTracks: Track[] = [];
 
       set({
         listeningHistory,

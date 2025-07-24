@@ -10,7 +10,7 @@ export default function LibraryLayout() {
       }}
     >
       <Stack.Screen name="favorites" />
-      <Stack.Screen name="offline" />
+      <Stack.Screen name="downloads" />
       <Stack.Screen name="history" />
       <Stack.Screen name="stats" />
       <Stack.Screen name="search" />

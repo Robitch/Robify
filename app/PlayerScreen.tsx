@@ -14,6 +14,7 @@ import { PlayPauseButton, SkipToNextButton, SkipToPreviousButton } from '@/compo
 import { useColorScheme } from '~/lib/useColorScheme';
 import TrackPlayer from 'react-native-track-player';
 import Slider from '@react-native-community/slider';
+import { usePlayerWithTracking } from '@/hooks/usePlayerWithTracking';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -40,8 +41,15 @@ const PlayerScreen = () => {
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { isDarkColorScheme } = useColorScheme();
-    const activeTrack = useActiveTrack();
-    const progress = useProgress();
+    
+    // Utiliser le hook de tracking intégré
+    const {
+        activeTrack,
+        playing,
+        progress,
+        isTracking,
+        currentTrack,
+    } = usePlayerWithTracking();
 
 
     // Enhanced animation values
